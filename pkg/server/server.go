@@ -6,24 +6,29 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"os"
 	"regexp"
 
+	// "github.com/andidroid/testgo/pkg/server/data"
 	"github.com/andidroid/testgo/pkg/mongo"
+	"github.com/andidroid/testgo/pkg/server/handler"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
-type Test struct {
-	Name string
-	ID   int64
-}
-
-var validPath = regexp.MustCompile("^/(hello|health|test)/([a-zA-Z0-9]+)$")
+var validPath = regexp.MustCompile("^/(hello|health|test|testmongo)/([a-zA-Z0-9]+)$")
 
 func Start() {
 	fmt.Println("start server")
 
+	logger := log.New(os.Stdout, "products-api ", log.LstdFlags)
+
+	testHandler := handler.NewTestHandler(logger)
+
 	http.HandleFunc("/hello/", makeHandler(helloHandler))
 	http.HandleFunc("/health/", makeHandler(healthHandler))
-	http.HandleFunc("/test/", makeHandler(testHandler))
+	http.HandleFunc("/testmongo/", makeHandler(testMongoHandler))
+	http.HandleFunc("/test/", testHandler.ServeHTTP)
+	http.Handle("/metrics", promhttp.Handler())
 
 	fmt.Println(GetLocalIPAddr())
 	err := http.ListenAndServe(":8090", nil)
@@ -72,17 +77,17 @@ func healthHandler(w http.ResponseWriter, r *http.Request, title string) {
 
 }
 
-func testHandler(w http.ResponseWriter, r *http.Request, title string) {
+func testMongoHandler(w http.ResponseWriter, r *http.Request, title string) {
 	mongo.Main()
 	fmt.Fprintf(w, "Test")
 
-	var t Test
+	// var t Test
 
-	// Try to decode the request body into the struct. If there is an error,
-	// respond to the client with the error message and a 400 status code.
-	err := json.NewDecoder(r.Body).Decode(&t)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
+	// // Try to decode the request body into the struct. If there is an error,
+	// // respond to the client with the error message and a 400 status code.
+	// err := json.NewDecoder(r.Body).Decode(&t)
+	// if err != nil {
+	// 	http.Error(w, err.Error(), http.StatusBadRequest)
+	// 	return
+	// }
 }

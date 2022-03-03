@@ -7,6 +7,7 @@ import (
 	"time"
 
 	//"github.com/hamba/avro"
+	"github.com/andidroid/testgo/internal/channel"
 	"github.com/segmentio/kafka-go"
 )
 
@@ -30,7 +31,7 @@ import (
 // 	}, nil
 // }
 
-func Writer() {
+func Writer(apichannel <-chan channel.ApiChannelEntity) {
 
 	fmt.Println("start kafka writer")
 	w := kafka.NewWriter(kafka.WriterConfig{
@@ -62,6 +63,11 @@ func Writer() {
 	done := make(chan bool)
 	ticker := time.NewTicker(time.Second)
 
+	//channel.ApiChannelEntity
+	apiChannelEntity := <-apichannel
+	//apiChannelEntity
+	log.Println(apiChannelEntity)
+
 	go func() {
 		for {
 			select {
@@ -74,7 +80,7 @@ func Writer() {
 
 				err := w.WriteMessages(ctx, kafka.Message{
 					Key:   []byte("Key-A"),
-					Value: []byte("Hello World! " + t.String()),
+					Value: []byte("Hello World! " + t.String() + fmt.Sprint(apiChannelEntity)),
 				})
 
 				if err != nil {

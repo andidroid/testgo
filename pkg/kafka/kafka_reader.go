@@ -7,6 +7,7 @@ import (
 	"time"
 
 	//"github.com/hamba/avro"
+	"github.com/andidroid/testgo/internal/channel"
 	"github.com/segmentio/kafka-go"
 )
 
@@ -30,7 +31,7 @@ import (
 // 	}, nil
 // }
 
-func Reader() {
+func Reader(apichannel chan<- channel.MessageChannelEntity) {
 
 	fmt.Println("start kafka reader")
 	r := kafka.NewReader(kafka.ReaderConfig{
@@ -62,6 +63,10 @@ func Reader() {
 			break
 		}
 		fmt.Printf("message at topic/partition/offset %v/%v/%v: %s = %s\n", m.Topic, m.Partition, m.Offset, string(m.Key), string(m.Value))
+
+		//e := channel.NewMessageChannelEntity(string(m.Value))
+		apichannel <- channel.MessageChannelEntity{Id: 1, Message: string(m.Value)}
+
 		if err := r.CommitMessages(ctx, m); err != nil {
 			log.Fatal("failed to commit messages:", err)
 		}

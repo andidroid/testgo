@@ -6,6 +6,7 @@ import (
 
 func main() {
 	fmt.Println("start kafka test")
-	go Reader()
-	Writer()
+
+	go Reader(nil)
+	Writer(nil)
 }
