@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"net/http"
 	"testing"
@@ -10,6 +11,12 @@ import (
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/wait"
 )
+
+var itest string
+
+func init() {
+	flag.StringVar(&itest, "itest", "", "the foo bar bang")
+}
 
 type AppContainer struct {
 	testcontainers.Container
@@ -157,9 +164,13 @@ func setupRedis(ctx context.Context) (*RedisContainer, error) {
 	return &RedisContainer{Container: container, URI: uri, Host: ip, Port: mappedPort.Port()}, nil
 }
 
-func TestIntegrationMonggitoLatestReturn(t *testing.T) {
+func TestTC(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping integration test")
+	}
+	if itest != "tcit" {
+		fmt.Print("skip itest")
+		t.Skip("Skipping for itest != tcit")
 	}
 
 	ctx := context.Background()
