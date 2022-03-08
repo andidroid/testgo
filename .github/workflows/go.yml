@@ -18,7 +18,15 @@ jobs:
         uses: actions/setup-go@v3
         with:
           go-version: 1.17
-
+      - name: Cache Go packages
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cache/go-build
+            ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
       - name: Build
         run: go build -o testgo cmd/main.go
 
@@ -42,7 +50,15 @@ jobs:
         uses: actions/setup-go@v3
         with:
           go-version: 1.17
-
+      - name: Cache Go packages
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cache/go-build
+            ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
       - name: Integrationtest
         run: go test -v test/. -itest=it
 
