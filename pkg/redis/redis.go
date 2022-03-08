@@ -1,4 +1,4 @@
-package main
+package redis
 
 import (
 	"context"
@@ -12,12 +12,14 @@ func main() {
 
 	ctx := context.Background()
 
-	rdb := redis.NewClient(&redis.Options{
+	redisClient := redis.NewClient(&redis.Options{
 		Addr:     "localhost:6379",
 		Password: "", // no password set
 		DB:       0,  // use default DB
 	})
 
+	status := redisClient.Ping(ctx)
+	fmt.Println(status)
 	// mongodbHost, ok := os.LookupEnv("MONGODB_HOST")
 	// 	if !ok {
 	// 		mongodbHost = "localhost"
@@ -40,14 +42,14 @@ func main() {
 	// 	panic(err)
 	// }
 
-	// rdb := redis.NewClient(opt)
+	// redisClient := redis.NewClient(opt)
 
-	err := rdb.Set(ctx, "key", "value", 0).Err()
+	err := redisClient.Set(ctx, "key", "value", 0).Err()
 	if err != nil {
 		panic(err)
 	}
 
-	val, err := rdb.Get(ctx, "key").Result()
+	val, err := redisClient.Get(ctx, "key").Result()
 	if err != nil {
 		panic(err)
 	}
