@@ -24,7 +24,7 @@ func GetRouteAsList(c *gin.Context) {
 	target, err := strconv.Atoi(c.Query("target"))
 	checkErr(err)
 
-	fmt.Printf("calling GetRouteAsList source=%s target=%s", source, target)
+	fmt.Printf("calling GetRouteAsList source=%d target=%d", source, target)
 
 	conn, err := pgsql.InitDB()
 	if err != nil {
@@ -73,7 +73,7 @@ func GetRouteAsGeometry(c *gin.Context) {
 	target, err := strconv.Atoi(c.Query("target"))
 	checkErr(err)
 
-	fmt.Printf("calling GetRouteAsGeometry source=%s target=%s", source, target)
+	fmt.Printf("calling GetRouteAsGeometry source=%d target=%d", source, target)
 
 	conn, err := pgsql.InitDB()
 	if err != nil {
