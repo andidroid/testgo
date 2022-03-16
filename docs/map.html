@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	
+	<title>Map Routing</title>
+
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	
+	<link rel="shortcut icon" type="image/x-icon" href="/assets/images/favicon.ico" />
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
+
+	<style>
+		html, body {
+			height: 100%;
+			margin: 0;
+		}
+		.leaflet-container {
+			height: 800px;
+			width: 800px;
+			max-width: 100%;
+			max-height: 100%;
+		}
+	</style>
+
+	
+</head>
+<body>
+
+
+
+    <div id="map" style="width: 800px; height: 800px;"></div>
+    <fieldset>
+        <legend>Order</legend>
+        <form action="/">
+            <legend for="order">order:</legend><input id="order" name="order" type="text" >
+            <legend for="truck">truck:</legend><input id="truck" name="truck" type="text"  >
+            <legend for="start">start:</legend><input id="start" name="start" type="number" min="1" max="9999999" >
+            <button id="btn_start" name="start" type="button">Berechnen</button>
+        </form>
+    </fieldset>
+    <fieldset>
+        <legend>Route</legend>
+        <form action="/">
+            <legend for="source">Source:</legend><input id="source" name="source" type="number" min="1" max="9999999" >
+            <legend for="target">Target:</legend><input id="target" name="target" type="number" min="1" max="9999999" >
+            <button id="calc" name="calc" type="button">Berechnen</button>
+        </form>
+    </fieldset>
+    <div class="event-data"></div>
+</body>
+
+    
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.1/jquery-ui.min.js"></script>
+    <!-- <script src="https://raw.github.com/mapbox/wellknown/master/wellknown.js"></script> -->
+    <script src="https://unpkg.com/jsts@2.8.1/dist/jsts.min.js"></script>
+    <script>
+
+        var map = L.map('map').setView([52.00, 11.50], 8);
+    
+        var tiles = L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
+            maxZoom: 18,
+            attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, ' +
+                'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+            id: 'mapbox/streets-v11',
+            tileSize: 512,
+            zoomOffset: -1
+        }).addTo(map);
+    
+
+        var myIcon = L.icon({
+    iconUrl: '/assets/images/marker-blue.svg',
+    iconSize: [25, 40],
+    iconAnchor: [13, 38],
+    popupAnchor: [-3, -38]});
+    console.log(myIcon)
+
+        var marker = L.marker([52.0, 11.50], {icon: myIcon}).addTo(map);
+    
+        var latlngs = [];
+        var polyline = L.polyline(latlngs, {color: 'red'}).addTo(map);
+
+
+        var routesLayer = L.layerGroup().addTo(map);
+
+            var baseMaps = {
+                "tiles": tiles
+            };
+
+            var overlayMaps = {
+                "marker": marker,
+                "track": polyline,
+                "routesLayer": routesLayer
+            };
+        L.control.layers(baseMaps, overlayMaps).addTo(map);
+
+        // EventSource object of javascript listens the streaming events from our go server and prints the message.
+        var stream = new EventSource("/stream");
+        stream.addEventListener("position", function(e){
+            //console.log(e.data)
+            // $('.event-data').append("POSITION" + e.data + "</br>")
+
+            var pe = JSON.parse(e.data);
+            
+            console.log(pe);
+            marker.setLatLng([pe.pos.lat, pe.pos.lon]);
+            polyline.addLatLng([pe.pos.lat, pe.pos.lon]);
+            // var ret = latlngs.push([pe.pos.lat, pe.pos.lon]);
+            // console.log(ret)
+            //TODO add position to current Track
+        });
+        stream.addEventListener("route", function(e){
+            console.log(e.data)
+            $('.event-data').append("ROUTE:" + e.data + "</br>")
+
+            var pe = JSON.parse(e.data);
+            
+            console.log(pe);
+            //TODO: add layer with route data
+
+            // var latlngs = [];
+            // var polyline = L.polyline(latlngs, {color: 'blue'}).addTo(map);
+
+//             L.geoJSON(pe.route, {
+//     style: function (feature) {
+//         return {color: 'blue'};
+//     }
+// }).bindPopup(function (layer) {
+//     return layer.feature.properties.description;
+// }).addTo(map);
+
+            routesLayer.eachLayer(function (layer) {
+                layer.setStyle({color: 'yellow'})
+            });
+
+            var layer = L.geoJSON(pe.route, {
+                style: function (feature) {
+                    return {color: 'blue', radius: 8};
+                }});
+            routesLayer.addLayer(layer)
+           
+        });
+
+        stream.addEventListener("action", function(e){
+            console.log(e.data)
+            $('.event-data').append("ACTION:" + e.data + "</br>")
+            var pe = JSON.parse(e.data);
+            var iconUrl;
+if(pe.action == 2) {
+    iconUrl= "/assets/images/marker-blue.svg";
+} else if(pe.action == 4) {
+    iconUrl= "/assets/images/marker-green.svg";
+} else if(pe.action == 6) {
+    iconUrl= "/assets/images/marker-yellow.svg";
+} else if(pe.action == 10) {
+    iconUrl= "/assets/images/marker-red.svg";
+}
+
+var myIcon = L.icon({
+    iconUrl: iconUrl,
+    iconSize: [25, 40],
+    iconAnchor: [13, 38],
+    popupAnchor: [-3, -38]});
+            marker.setIcon(myIcon);
+        });
+
+        $.get( "http://localhost/routing/poi", function( data ) {
+                console.log(data)
+
+                var geojsonMarkerOptions = {
+                    radius: 4,
+                    fillColor: "#ff7800",
+                    color: "#000",
+                    weight: 1,
+                    opacity: 1,
+                    fillOpacity: 0.8
+                };
+
+
+// style: function (feature) {
+//                     return {color: 'blue'};
+//                 }
+
+                var poiLayer = L.geoJSON(data, {
+
+                    pointToLayer: function (feature, latlng) {
+                        return L.circleMarker(latlng, geojsonMarkerOptions);
+                    },
+                    onEachFeature: function (feature, layer) {
+                        if (feature.properties) {
+                            console.log(feature.properties)
+                            layer.bindPopup(feature.properties.osm_id + " " + feature.properties.name);
+
+                            layer.on({click: function(e){console.log(e);console.log(e.sourceTarget.feature)}});
+                        }
+                    }
+
+                });
+                poiLayer.addTo(map);
+                overlayMaps.poi=poiLayer
+            });
+
+
+
+$( document ).ready(function() {
+
+    $( "#source" ).focus(function() {
+        function onMapClick(e) {
+            console.log(e.latlng)
+            
+            $.get( "http://localhost/node/source?lon=" + e.latlng.lng +"&lat=" + e.latlng.lat, function( data ) {
+                console.log(data)
+                $( "#source" ).val( data.id );
+                var marker = L.marker([data.lat, data.lon], {title: "source:"+data.id}).addTo(map);
+                map.off('click');
+                $( "#target" ).focus();
+            });
+        }
+        map.on('click', onMapClick);
+    });
+
+    $( "#target" ).focus(function() {
+        function onMapClick(e) {
+            console.log(e.latlng)
+            $.get( "http://localhost/node/target?lon=" + e.latlng.lng +"&lat=" + e.latlng.lat, function( data ) {
+                console.log(data)
+                $( "#target" ).val( data.id );
+                var marker = L.marker([data.lat, data.lon], {title: "target:"+data.id}).addTo(map);
+                map.off('click');
+            });
+        }
+        map.on('click', onMapClick);
+    });
+
+
+   
+    $( "#calc" ).click(function() {
+        var s = $( "#source" ).val();
+        var t = $( "#target" ).val();
+
+        $.get( "http://localhost/routing/geometry?source=" + s +"&target=" + t, function( data ) {
+            console.log(data)
+            
+            // var parse = require('wellknown');
+            // var geojsonLayer = L.geoJson(parse(data));
+
+            var reader = new jsts.io.WKTReader()
+            var a = reader.read(data)
+            console.log(a)
+            var writer = new jsts.io.GeoJSONWriter()
+            var geoJSON = writer.write(a)
+            var geojsonLayer = L.geoJson(geoJSON);
+
+            geojsonLayer.addTo(map);
+        });
+    });
+
+    $( "#btn_start" ).click(function() {
+        var order = $( "#order" ).val();
+        var truck = $( "#truck" ).val();
+        var start = $( "#start" ).val();
+
+        $.get( "http://localhost/fleet/start", { order: order, truck: truck,start:start } , function( data ) {
+            console.log(data)
+
+        });
+    });
+
+
+});
+    </script>
+
+
+
+</html>

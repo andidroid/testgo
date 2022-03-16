@@ -4,8 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"time"
 
 	"github.com/go-playground/validator"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type TestType int
@@ -21,10 +23,11 @@ const (
 )
 
 type Test struct {
-	ID          int      `json:"id"`
-	Name        string   `json:"name"`
-	Description string   `json:"description" validate:"required"`
-	TestType    TestType `json:"type" validate:"gte=1,lte3"` //validate:"validateTestType"
+	ID          primitive.ObjectID `json:"id" bson:"_id"`
+	Name        string             `json:"name" bson:"name"`
+	Description string             `json:"description" bson:"description" validate:"required"`
+	TestType    TestType           `json:"type" bson:"type" validate:"gte=1,lte10"` //validate:"validateTestType"
+	RunAt       time.Time          `json:"run" bson:"run"`
 	// ... `json:"-"`
 }
 
@@ -76,31 +79,31 @@ func GetTests() Tests {
 	return productList
 }
 
-func GetTestById(id int) (*Test, error) {
+func GetTestById(id primitive.ObjectID) (*Test, error) {
 	t, _, e := findTestById(id)
 
 	return t, e
 }
 
 func AddTest(p *Test) error {
-	p.ID = getNextID()
+	p.ID = primitive.NewObjectID()
 	productList = append(productList, p)
 	return nil
 }
 
-func UpdateTest(id int, p *Test) error {
+func UpdateTest(id primitive.ObjectID, p *Test) error {
 	_, pos, err := findTestById(id)
 	if err != nil {
 		return err
 	}
 
-	p.ID = id
+	p.ID = primitive.NewObjectID()
 	productList[pos] = p
 
 	return nil
 }
 
-func DeleteTest(id int) error {
+func DeleteTest(id primitive.ObjectID) error {
 	_, pos, err := findTestById(id)
 	if err != nil {
 		return err
@@ -118,7 +121,7 @@ func removeIndexInSlice(slice []*Test, i int) []*Test {
 
 var ErrTestNotFound = fmt.Errorf("Test not found")
 
-func findTestById(id int) (*Test, int, error) {
+func findTestById(id primitive.ObjectID) (*Test, int, error) {
 	for i, p := range productList {
 		if p.ID == id {
 			return p, i, nil
@@ -128,21 +131,16 @@ func findTestById(id int) (*Test, int, error) {
 	return nil, -1, ErrTestNotFound
 }
 
-func getNextID() int {
-	lp := productList[len(productList)-1]
-	return lp.ID + 1
-}
-
 // productList is a hard coded list of products for this
 // example data source
 var productList = []*Test{
 	&Test{
-		ID:          1,
+		ID:          primitive.NewObjectID(),
 		Name:        "Latte",
 		Description: "Frothy milky coffee",
 	},
 	&Test{
-		ID:          2,
+		ID:          primitive.NewObjectID(),
 		Name:        "Espresso",
 		Description: "Short and strong coffee without milk",
 	},
