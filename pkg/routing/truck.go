@@ -46,6 +46,11 @@ func (truck *Truck) SetActionType(ActionType ActionType) {
 	truck.sendTruckActionEvent()
 }
 
+func (truck *Truck) SetRoute(route *Route) {
+	truck.Route = route
+	truck.sendRouteEvent()
+}
+
 func (truck *Truck) sendTruckActionEvent() {
 	pe := TruckActionEvent{
 		ID:         truck.ID,
@@ -129,57 +134,17 @@ func (truck *Truck) StartOrder(order *Order) {
 
 		fmt.Println("truck starting route", truck.Name, source, target, i)
 
-		url := fmt.Sprintf("http://localhost/routing/geometry?source=%d&target=%d", source, target)
-		resp, err := http.Get(url)
+		//fmt.Println(resp.Body)
+		// fmt.Println(route)
+		//
+		//
+		route, err := truck.requestRoute(source, target, i)
 		util.CheckErr(err)
 		if err != nil {
 			return
 		}
 
-		//fmt.Println(resp.Body)
-
-		body, err := ioutil.ReadAll(resp.Body)
-		util.CheckErr(err)
-
-		var route Route
-		err = json.Unmarshal(body, &route)
-		route.ID = int64(i)
-		util.CheckErr(err)
-		// fmt.Println(route)
-		truck.Route = &route
-
-		node := truck.requestNode(source)
-
-		if node.Lon == route.Coordinates[0][0] && node.Lat == route.Coordinates[0][1] {
-			//
-			fmt.Println("route is in correct order")
-		} else {
-			node = truck.requestNode(target)
-
-			if node.Lon == route.Coordinates[0][0] && node.Lat == route.Coordinates[0][1] {
-				//
-				fmt.Println("route is in wrong order, need reverse order")
-
-				len := len(route.Coordinates)
-				for i := 0; i < len/2; i++ {
-					j := len - 1 - i
-					if i == j {
-						break
-					}
-					ci := route.Coordinates[i]
-					cj := route.Coordinates[j]
-
-					route.Coordinates[i] = cj
-					route.Coordinates[j] = ci
-				}
-
-			} else {
-				fmt.Println("error finding correct route order")
-			}
-
-		}
-
-		truck.sendRouteEvent()
+		truck.SetRoute(&route)
 
 		//
 
@@ -206,6 +171,75 @@ func (truck *Truck) StartOrder(order *Order) {
 
 	fmt.Printf("--- start order %s %s ---", truck.Name, order.Name)
 
+}
+
+func (truck *Truck) requestRoute(source int64, target int64, id int) (Route, error) {
+
+	fmt.Println("request Route: ", source, target)
+	routeKey := fmt.Sprintf("route_%d_%d", source, target)
+
+	var route Route
+	routeString, err := redis.GetClient().Get(context.Background(), routeKey).Result()
+	util.CheckErr(err)
+
+	fmt.Println("redis GET Route: ", routeKey, routeString, err)
+	var routeBytes []byte
+
+	if err != nil || routeString == "" {
+		//request from server
+		url := fmt.Sprintf("http://localhost/routing/geometry?source=%d&target=%d", source, target)
+		resp, err := http.Get(url)
+		util.CheckErr(err)
+		if err != nil {
+			return Route{}, fmt.Errorf("error requesting route: %w", err)
+		}
+		fmt.Println("server GET Route: ", routeKey, resp, err)
+
+		routeBytes, err = ioutil.ReadAll(resp.Body)
+		util.CheckErr(err)
+		routeString = string(routeBytes)
+		err = redis.GetClient().Set(context.Background(), routeKey, routeString, 5*time.Minute).Err()
+		util.CheckErr(err)
+		fmt.Println("redis SET Node: ", routeKey, routeString, err)
+	} else {
+		routeBytes = []byte(routeString)
+	}
+
+	err = json.Unmarshal(routeBytes, &route)
+	util.CheckErr(err)
+
+	//request start node to check route direction
+	node := truck.requestNode(source)
+
+	if node.Lon == route.Coordinates[0][0] && node.Lat == route.Coordinates[0][1] {
+
+		fmt.Println("route is in correct order")
+	} else {
+		node = truck.requestNode(target)
+
+		if node.Lon == route.Coordinates[0][0] && node.Lat == route.Coordinates[0][1] {
+
+			fmt.Println("route is in wrong order, need reverse order")
+
+			len := len(route.Coordinates)
+			for i := 0; i < len/2; i++ {
+				j := len - 1 - i
+				if i == j {
+					break
+				}
+				ci := route.Coordinates[i]
+				cj := route.Coordinates[j]
+
+				route.Coordinates[i] = cj
+				route.Coordinates[j] = ci
+			}
+
+		} else {
+			fmt.Println("error finding correct route order")
+		}
+
+	}
+	return route, nil
 }
 
 type Route struct {

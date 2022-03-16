@@ -31,7 +31,7 @@ func init() {
 	//go fleet.StartOrder("order-0815", "trucky", 84845)
 }
 
-func GetINSTANCE() *Fleet {
+func GetFleetInstance() *Fleet {
 	return &fleet
 }
 
@@ -114,4 +114,18 @@ func (fleet Fleet) StartOrder(orderName string, truckName string, startNodeId in
 	}()
 
 	return nil
+}
+
+func (fleet Fleet) FindFreeTruck() []*Truck {
+
+	var freeTrucks = make([]*Truck, 0, 1)
+	for key, truck := range fleet.Trucks {
+		fmt.Println("Key:", key, "=>", "Element:", truck)
+
+		truck := fleet.Trucks[key]
+		if truck.ActionType == STOPPED || truck.ActionType == HOMEWARD {
+			freeTrucks = append(freeTrucks, truck)
+		}
+	}
+	return freeTrucks
 }
