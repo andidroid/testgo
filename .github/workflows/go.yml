@@ -31,7 +31,7 @@ jobs:
         run: go build -o testgo cmd/main.go
 
       - name: Test
-        run: go test -v ./...
+        run: go test -short -v ./...
       - name: upload artifact
         uses: actions/upload-artifact@v2
         with:

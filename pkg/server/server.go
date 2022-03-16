@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"time"
 
+	"github.com/andidroid/testgo/pkg/redis"
 	"github.com/andidroid/testgo/pkg/server/handler"
 	"github.com/gin-contrib/cors"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -23,7 +23,6 @@ import (
 
 	// "github.com/gin-contrib/sessions/redis"
 	"github.com/gin-gonic/gin"
-	"github.com/go-redis/redis/v8"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -96,32 +95,7 @@ func init() {
 
 	mongoDatabase := mongoClient.Database("test")
 
-	redisHost, ok := os.LookupEnv("REDIS_HOST")
-	if !ok {
-		redisHost = "localhost"
-		os.Setenv("REDIS_HOST", "localhost")
-	}
-	fmt.Printf("REDIS_HOST: %s\n", redisHost)
-
-	redisPort, ok := os.LookupEnv("REDIS_PORT")
-	if !ok {
-		redisPort = "6379"
-		os.Setenv("REDIS_PORT", "6379")
-	}
-	fmt.Printf("REDIS_PORT: %s\n", redisPort)
-
-	redisURL := os.ExpandEnv("$REDIS_HOST:$REDIS_PORT")
-	fmt.Println("Redis URL: ", redisURL)
-
-	redisClient := redis.NewClient(&redis.Options{
-		Addr:         redisURL,
-		Password:     "", // no password set
-		DB:           0,  // use default DB
-		DialTimeout:  1 * time.Second,
-		ReadTimeout:  1 * time.Second,
-		WriteTimeout: 1 * time.Second,
-		MaxRetries:   1,
-	})
+	redisClient := redis.CreateClient()
 
 	//Add distributed tracing to redis client
 	//go get github.com/go-redis/redis/extra/redisotel/v8
@@ -189,8 +163,24 @@ func CreateRouter() *gin.Engine {
 	// Simple group: v1
 	v1 := router.Group("/routing")
 	{
+		v1.GET("/tsp", handler.GetTSP)
 		v1.GET("/list", handler.GetRouteAsList)
 		v1.GET("/geometry", handler.GetRouteAsGeometry)
+		v1.GET("/poi", handler.GetPOIs)
+		v1.GET("/poi/:osm_id/node", handler.GetNearestNode)
+
+	}
+	v2 := router.Group("/node")
+	{
+		v2.GET("/source", handler.GetNodeSearchSource)
+		v2.GET("/target", handler.GetNodeSearchTarget)
+		v2.GET("/unknown", handler.GetNodeSearchQuery)
+		v2.GET("/:id", handler.GetNodeById)
+	}
+
+	v3 := router.Group("/fleet")
+	{
+		v3.GET("/start", handler.HandlePostStartOrderRequest)
 
 	}
 

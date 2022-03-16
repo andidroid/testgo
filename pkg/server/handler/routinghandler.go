@@ -6,6 +6,8 @@ import (
 	"strconv"
 
 	"github.com/andidroid/testgo/pkg/pgsql"
+	"github.com/andidroid/testgo/pkg/routing"
+	"github.com/andidroid/testgo/pkg/util"
 	"github.com/gin-gonic/gin"
 )
 
@@ -20,18 +22,18 @@ import (
 //localhost:8080/routing/list?source=1529&target=2225
 func GetRouteAsList(c *gin.Context) {
 	source, err := strconv.Atoi(c.Query("source"))
-	checkErr(err)
+	util.CheckErr(err)
 	target, err := strconv.Atoi(c.Query("target"))
-	checkErr(err)
+	util.CheckErr(err)
 
 	fmt.Printf("calling GetRouteAsList source=%d target=%d", source, target)
 
-	conn, err := pgsql.InitDB()
+	conn, err := pgsql.GetConnection()
 	if err != nil {
 		fmt.Println("err connecting to  database", err)
 	}
 
-	sql := fmt.Sprintf("select edge FROM pgr_dijkstra('SELECT osm_id as id, source, target, cost FROM public.view_routing', %d , %d ,true)", source, target)
+	sql := fmt.Sprintf("select edge FROM pgr_dijkstra('SELECT osm_id as id, source, target, cost FROM public.view_routing', %d , %d ,%t)", source, target, routing.DIRECTED_GRAPH)
 	stmt, err := conn.Prepare(sql)
 	if err != nil {
 		fmt.Println("err connecting to  database", err)
@@ -69,18 +71,33 @@ func GetRouteAsList(c *gin.Context) {
 //localhost:8080/routing/geometry?source=1529&target=2225
 func GetRouteAsGeometry(c *gin.Context) {
 	source, err := strconv.Atoi(c.Query("source"))
-	checkErr(err)
+	util.CheckErr(err)
 	target, err := strconv.Atoi(c.Query("target"))
-	checkErr(err)
+	util.CheckErr(err)
+	format := c.Query("format")
 
-	fmt.Printf("calling GetRouteAsGeometry source=%d target=%d", source, target)
+	fmt.Printf("calling GetRouteAsGeometry source=%d target=%d format=%s", source, target, format)
 
-	conn, err := pgsql.InitDB()
+	conn, err := pgsql.GetConnection()
 	if err != nil {
 		fmt.Println("err connecting to  database", err)
 	}
 
-	sql := fmt.Sprintf("select ST_AsText(ST_LineMerge(ST_Union(geom))) from public.roads where osm_id in (select edge FROM pgr_dijkstra('SELECT osm_id as id, source, target, cost FROM public.view_routing', %d , %d ,true))", source, target)
+	var encoding string
+	if format == "" {
+		format = "ST_AsGeoJson"
+		encoding = "application/json; charset=utf-8"
+	} else if format == "geojson" {
+		encoding = "application/json; charset=utf-8"
+		format = "ST_AsGeoJson"
+	} else if format == "wkt" {
+		format = "ST_AsText"
+		encoding = "application/text; charset=utf-8"
+	}
+
+	//ST_AsText
+	//ST_Union
+	sql := fmt.Sprintf("select %s(ST_LineMerge(ST_Collect(geom))) from public.roads where osm_id in (select edge FROM pgr_dijkstra('SELECT osm_id as id, source, target, cost FROM public.view_routing', %d , %d ,%t))", format, source, target, routing.DIRECTED_GRAPH)
 	stmt, err := conn.Prepare(sql)
 	if err != nil {
 		fmt.Println("err connecting to  database", err)
@@ -101,14 +118,9 @@ func GetRouteAsGeometry(c *gin.Context) {
 		fmt.Println("err connecting to  database", err)
 	}
 
-	fmt.Println("edge", edge)
+	// fmt.Println("edge", edge)
 	stmt.Close()
 
-	c.JSON(http.StatusOK, edge)
-}
-
-func checkErr(err error) {
-	if err != nil {
-		fmt.Println("err connecting to  database", err)
-	}
+	c.Data(200, encoding, []byte(edge))
+	//c.JSON(http.StatusOK, edge)
 }

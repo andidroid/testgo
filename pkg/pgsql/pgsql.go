@@ -5,8 +5,32 @@ import (
 
 	"database/sql"
 
+	"github.com/andidroid/testgo/pkg/util"
 	_ "github.com/lib/pq" // sql behavior modified
 )
+
+var connection *sql.DB
+
+func init() {
+	var err error
+	connection, err = InitDB()
+	util.CheckErr(err)
+}
+
+func InitDB() (*sql.DB, error) {
+	fmt.Println("create database connection")
+	var connectionString = fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
+		host, port, user, password, dbname)
+
+	// var err error
+	db, err := sql.Open("postgres", connectionString)
+
+	if err != nil {
+		fmt.Println("Error ", err)
+	}
+
+	return db, err
+}
 
 func main() {
 
@@ -21,15 +45,8 @@ const (
 	schema   = "public"
 )
 
-func InitDB() (*sql.DB, error) {
-	fmt.Println("create database connection")
-	var connectionString = fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
-		host, port, user, password, dbname)
-
-	// var err error
-	db, err := sql.Open("postgres", connectionString)
-
-	return db, err
+func GetConnection() (*sql.DB, error) {
+	return connection, nil
 }
 
 // return db
