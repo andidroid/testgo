@@ -12,7 +12,7 @@ require (
 	github.com/lib/pq v1.10.4
 	github.com/prometheus/client_golang v1.12.1
 	github.com/segmentio/kafka-go v0.4.30
-	github.com/stretchr/testify v1.7.0
+	github.com/stretchr/testify v1.7.1
 	github.com/testcontainers/testcontainers-go v0.12.0
 	go.mongodb.org/mongo-driver v1.8.4
 	go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin v0.29.0
