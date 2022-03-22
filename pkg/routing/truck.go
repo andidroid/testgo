@@ -28,12 +28,12 @@ const (
 )
 
 type Truck struct {
-	ID         int64      `json:"id" bson:"_id"`
-	Name       string     `json:"name" bson:"name"`
-	Position   *Position  `json:"pos" bson:"pos"`
-	Route      *Route     `json:"route" bson:"route"`
-	Base       int64      `json:"base" bson:"base"`
-	ActionType ActionType `json:"action" bson:"action"`
+	ID         int64      `json:"id" bson:"_id" db:"id"`
+	Name       string     `json:"name" bson:"name" db:"name"`
+	Position   *Position  `json:"pos" bson:"-" db:"-"`
+	Route      *Route     `json:"route" bson:"-" db:"-"`
+	Base       int64      `json:"base" bson:"base" db:"base"`
+	ActionType ActionType `json:"action" bson:"action" db:"-"`
 }
 
 func NewTruck(name string) *Truck {
