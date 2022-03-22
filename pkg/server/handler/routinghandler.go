@@ -29,22 +29,16 @@ func GetRouteAsList(c *gin.Context) {
 	fmt.Printf("calling GetRouteAsList source=%d target=%d", source, target)
 
 	conn, err := pgsql.GetConnection()
-	if err != nil {
-		fmt.Println("err connecting to  database", err)
-	}
+	util.CheckErr(err)
 
 	sql := fmt.Sprintf("select edge FROM pgr_dijkstra('SELECT osm_id as id, source, target, cost FROM public.view_routing', %d , %d ,%t)", source, target, routing.DIRECTED_GRAPH)
 	stmt, err := conn.Prepare(sql)
-	if err != nil {
-		fmt.Println("err connecting to  database", err)
-	}
+	util.CheckErr(err)
 	//source=1529&target=2225
 	//(source, target
 
 	rows, err := stmt.Query() // (source, target)
-	if err != nil {
-		fmt.Println("err connecting to  database", err)
-	}
+	util.CheckErr(err)
 
 	// rows, err := conn.Query("select edge FROM pgr_dijkstra('SELECT osm_id as id, source, target, cost, cost as reverse_cost FROM public.roads', $1 , $2 ,true)")
 	// checkErr(err)

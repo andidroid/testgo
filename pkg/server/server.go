@@ -182,6 +182,11 @@ func CreateRouter() *gin.Engine {
 	{
 		v3.GET("/start", handler.HandlePostStartOrderRequest)
 
+		v3.GET("/truck", handler.HandleGetAllTrucksRequest)
+		v3.GET("/truck/:id", handler.HandleGetTruckRequest)
+		v3.POST("/truck", handler.HandlePostTruckRequest)
+		v3.PUT("/truck/:id", handler.HandlePutTruckRequest)
+		v3.DELETE("/truck/:id", handler.HandleDeleteTruckRequest)
 	}
 
 	router.GET("/stream", handler.HeadersMiddleware(), streamHandler.ServeHTTP(), streamHandler.GetPositionStream)
