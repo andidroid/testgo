@@ -19,7 +19,7 @@ require (
 	go.opentelemetry.io/contrib/instrumentation/go.mongodb.org/mongo-driver/mongo/otelmongo v0.30.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.30.0
 	go.opentelemetry.io/otel v1.6.0
-	go.opentelemetry.io/otel/exporters/jaeger v1.5.0
+	go.opentelemetry.io/otel/exporters/jaeger v1.6.0
 	go.opentelemetry.io/otel/sdk v1.6.0
 	google.golang.org/grpc v1.45.0
 	google.golang.org/protobuf v1.28.0
