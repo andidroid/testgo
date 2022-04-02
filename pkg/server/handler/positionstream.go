@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 
@@ -26,12 +27,12 @@ func (stream *EventStreamHandler) GetPositionStream(c *gin.Context) {
 	go func() {
 		ctx := context.Background()
 		sub := redis.GetClient().Subscribe(ctx, "position", "route", "action")
-		pe := routing.PostionEvent{}
+		pe := routing.PositionEvent{}
 		for {
 			//routing.PostionEvent
 			msg, err := sub.ReceiveMessage(ctx)
 			util.CheckErr(err)
-			// fmt.Println(msg)
+			fmt.Println(msg)
 
 			switch msg.Channel {
 			case "position":
@@ -167,7 +168,7 @@ func (stream *EventStreamHandler) GetPositionStream(c *gin.Context) {
 
 type EventStreamHandler struct {
 	// Events are pushed to this channel by the main events-gathering routine
-	PositionEventMessage    chan routing.PostionEvent
+	PositionEventMessage    chan routing.PositionEvent
 	RouteEventMessage       chan routing.RouteEvent
 	TruckActionEventMessage chan routing.TruckActionEvent
 
@@ -187,7 +188,7 @@ type ClientChan chan string
 func NewEventStreamHandler() (event *EventStreamHandler) {
 
 	event = &EventStreamHandler{
-		PositionEventMessage:    make(chan routing.PostionEvent),
+		PositionEventMessage:    make(chan routing.PositionEvent),
 		RouteEventMessage:       make(chan routing.RouteEvent),
 		TruckActionEventMessage: make(chan routing.TruckActionEvent),
 		NewClients:              make(chan chan string),

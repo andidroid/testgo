@@ -1,9 +1,12 @@
 package util
 
-import "fmt"
+import (
+	"fmt"
+)
 
 func CheckErr(err error) {
 	if err != nil {
 		fmt.Println("errrrror occured", err)
+
 	}
 }

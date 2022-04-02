@@ -11,29 +11,9 @@ import (
 
 type POI struct {
 	ID       int64  `json:"id" bson:"_id" db:"fid"`
-	Osm_ID   string `json:"osm_id" bson:"osm_id" db:"osm_id"`
+	Osm_ID   int64  `json:"osm_id" bson:"osm_id" db:"osm_id"`
 	Name     string `json:"name" bson:"name"`
 	GeomJSON string `db:"geom" json:"-"`
-}
-
-//geom,omitempty
-
-//{"type":"Point","coordinates":[12.4045328,51.7979734]}
-type GeoJSON struct {
-	Type        string    `json:"type" bson:"type"`
-	Coordinates []float64 `json:"coordinates" bson:"coordinates"`
-}
-
-type FeatureCollection struct {
-	Type    string     `json:"type" bson:"type"`
-	Feature *[]Feature `json:"features" bson:"features"`
-	Name    string     `json:"name" bson:"name"`
-}
-
-type Feature struct {
-	Type string  `json:"type" bson:"type"`
-	Geom GeoJSON `json:"geometry" bson:"geom" db:"-"`
-	POI  *POI    `json:"properties" bson:"properties"`
 }
 
 func ReadAllPOIs() (*FeatureCollection, error) {
@@ -73,15 +53,16 @@ func ReadAllPOIs() (*FeatureCollection, error) {
 	features := make([]Feature, len(pois))
 
 	for i := 0; i < len(pois); i++ {
-		var geojson GeoJSON
+		var geojson Geometry
 		b := []byte(pois[i].GeomJSON)
 		json.Unmarshal(b, &geojson)
 		//pois[i].Geom = geojson
 
 		f := Feature{}
+		f.ID = string(i)
 		f.Type = "Feature"
 		f.Geom = geojson
-		f.POI = &pois[i]
+		f.Properties = &pois[i]
 		features[i] = f
 	}
 
@@ -90,7 +71,7 @@ func ReadAllPOIs() (*FeatureCollection, error) {
 
 	col := FeatureCollection{}
 	col.Type = "FeatureCollection"
-	col.Feature = &features
+	col.Features = &features
 	col.Name = "POIs"
 
 	//col.POI = &pois

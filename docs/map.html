@@ -79,7 +79,19 @@
     console.log(myIcon)
 
         var marker = L.marker([52.0, 11.50], {icon: myIcon}).addTo(map);
-    
+            marker.bindPopup("marker");//.openPopup();
+
+// function onMarkerClick(e) {
+//    var popup = e.target.getPopup();
+//    popup.openPopup();
+   
+//    popup.setContent( e );
+// }
+
+//             marker.on('click', onMarkerClick );
+
+
+
         var latlngs = [];
         var polyline = L.polyline(latlngs, {color: 'red'}).addTo(map);
 
@@ -107,6 +119,8 @@
             
             console.log(pe);
             marker.setLatLng([pe.pos.lat, pe.pos.lon]);
+            marker.getPopup().setContent(pe.pos.lat + " - " + pe.pos.lon);
+
             polyline.addLatLng([pe.pos.lat, pe.pos.lon]);
             // var ret = latlngs.push([pe.pos.lat, pe.pos.lon]);
             // console.log(ret)
@@ -149,22 +163,24 @@
             $('.event-data').append("ACTION:" + e.data + "</br>")
             var pe = JSON.parse(e.data);
             var iconUrl;
-if(pe.action == 2) {
-    iconUrl= "/assets/images/marker-blue.svg";
-} else if(pe.action == 4) {
-    iconUrl= "/assets/images/marker-green.svg";
-} else if(pe.action == 6) {
-    iconUrl= "/assets/images/marker-yellow.svg";
-} else if(pe.action == 10) {
-    iconUrl= "/assets/images/marker-red.svg";
-}
+            if(pe.action == 2) {
+                iconUrl= "/assets/images/marker-blue.svg";
+            } else if(pe.action == 4) {
+                iconUrl= "/assets/images/marker-green.svg";
+            } else if(pe.action == 6) {
+                iconUrl= "/assets/images/marker-yellow.svg";
+            } else if(pe.action == 10) {
+                iconUrl= "/assets/images/marker-red.svg";
+            }
 
-var myIcon = L.icon({
-    iconUrl: iconUrl,
-    iconSize: [25, 40],
-    iconAnchor: [13, 38],
-    popupAnchor: [-3, -38]});
+            var myIcon = L.icon({
+                iconUrl: iconUrl,
+                iconSize: [25, 40],
+                iconAnchor: [13, 38],
+                popupAnchor: [-3, -38]});
             marker.setIcon(myIcon);
+
+            marker.getPopup().setContent(pe.action);
         });
 
         $.get( "http://localhost/routing/poi", function( data ) {

@@ -8,8 +8,9 @@ import (
 )
 
 type Tsp struct {
-	Start int       `json:"start" bson:"start"`
-	Steps []TspStep `json:"steps" bson:"steps"`
+	Start  int       `json:"start" bson:"start"`
+	Steps  []TspStep `json:"steps" bson:"steps"`
+	Places string    `json:"places" bson:"places"`
 }
 
 type TspStep struct {
@@ -19,7 +20,8 @@ type TspStep struct {
 	AggCost float64 `json:"agg_cost" bson:"agg_cost"`
 }
 
-func CalculateTSP(start int) (*Tsp, error) {
+//ids []int
+func CalculateTSP(start int, ids string) (*Tsp, error) {
 
 	conn, err := pgsql.GetConnection()
 	if err != nil {
@@ -34,7 +36,18 @@ func CalculateTSP(start int) (*Tsp, error) {
 			return "cost"
 		}
 	}()
-	sql := fmt.Sprintf("SELECT * FROM pgr_TSP($$ SELECT * FROM pgr_dijkstraCostMatrix('SELECT osm_id as id, source, target, cost, %s FROM view_routing',( with nearestVertices as ( SELECT a.id from view_place_routing, lateral ( select id, the_geom from roads_vertices_pgr where ein > 0 and eout > 0 order by roads_vertices_pgr.the_geom <-> view_place_routing.geom limit 1 ) a) select array_agg(id) from nearestVertices), directed := %t)$$, start_id := %d)", cost, DIRECTED_GRAPH, start)
+
+	var inQuery string
+	//ids != nil &&
+	if len(ids) > 0 {
+		//strings.Join(ids, ",")
+		inQuery = fmt.Sprintf("WHERE view_place_routing.osm_id IN(%s)", ids)
+	} else {
+		inQuery = ""
+	}
+
+	sql := fmt.Sprintf("SELECT * FROM pgr_TSP($$ SELECT * FROM pgr_dijkstraCostMatrix('SELECT osm_id as id, source, target, cost, %s FROM view_routing',( with nearestVertices as ( SELECT a.id from view_place_routing , lateral ( select id, the_geom from roads_vertices_pgr where ein > 0 and eout > 0 order by roads_vertices_pgr.the_geom <-> view_place_routing.geom limit 1 ) a %s) select array_agg(id) from nearestVertices), directed := %t)$$, start_id := %d)", cost, inQuery, DIRECTED_GRAPH, start)
+	fmt.Println(sql)
 	stmt, err := conn.Prepare(sql)
 	if err != nil {
 		fmt.Println("err connecting to  database", err)
@@ -58,7 +71,7 @@ func CalculateTSP(start int) (*Tsp, error) {
 
 	// fmt.Printf("%#v", steps)
 
-	var tsp = Tsp{Start: start, Steps: steps}
+	var tsp = Tsp{Start: start, Steps: steps, Places: ids}
 	rows.Close()
 	stmt.Close()
 
