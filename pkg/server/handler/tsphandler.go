@@ -24,9 +24,20 @@ func GetTSP(c *gin.Context) {
 	start, err := strconv.Atoi(c.Query("start"))
 	util.CheckErr(err)
 
-	fmt.Printf("calling GetTSP start=%d", start)
+	idsQueryParam := c.Query("ids")
+	// idsStrings := strings.Split(idsQueryParam, ",")
 
-	tsp, err := routing.CalculateTSP(start)
+	// ids := make([]int, len(idsStrings))
+	// for i := 0; i < len(idsQueryParam); i++ {
+
+	// 	id, err := strconv.Atoi(idsStrings[i])
+	// 	util.CheckErr(err)
+	// 	ids[i] = id
+	// }
+	fmt.Printf("calling GetTSP start=%d ids=%s", start, idsQueryParam) //%d ids
+
+	idsQueryParam = "55225524,33997995,33176384,240122791"
+	tsp, err := routing.CalculateTSP(start, idsQueryParam) //ids
 	if err != nil {
 		c.Status(500)
 		return

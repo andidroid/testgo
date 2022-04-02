@@ -76,7 +76,7 @@ func (p *Test) Validate() error {
 
 // GetProducts returns a list of products
 func GetTests() Tests {
-	return productList
+	return testList
 }
 
 func GetTestById(id primitive.ObjectID) (*Test, error) {
@@ -87,7 +87,7 @@ func GetTestById(id primitive.ObjectID) (*Test, error) {
 
 func AddTest(p *Test) error {
 	p.ID = primitive.NewObjectID()
-	productList = append(productList, p)
+	testList = append(testList, p)
 	return nil
 }
 
@@ -98,7 +98,7 @@ func UpdateTest(id primitive.ObjectID, p *Test) error {
 	}
 
 	p.ID = primitive.NewObjectID()
-	productList[pos] = p
+	testList[pos] = p
 
 	return nil
 }
@@ -109,7 +109,7 @@ func DeleteTest(id primitive.ObjectID) error {
 		return err
 	}
 
-	productList = removeIndexInSlice(productList, pos)
+	testList = removeIndexInSlice(testList, pos)
 
 	return nil
 }
@@ -122,7 +122,7 @@ func removeIndexInSlice(slice []*Test, i int) []*Test {
 var ErrTestNotFound = fmt.Errorf("Test not found")
 
 func findTestById(id primitive.ObjectID) (*Test, int, error) {
-	for i, p := range productList {
+	for i, p := range testList {
 		if p.ID == id {
 			return p, i, nil
 		}
@@ -131,9 +131,9 @@ func findTestById(id primitive.ObjectID) (*Test, int, error) {
 	return nil, -1, ErrTestNotFound
 }
 
-// productList is a hard coded list of products for this
+// testList is a hard coded list of products for this
 // example data source
-var productList = []*Test{
+var testList = []*Test{
 	&Test{
 		ID:          primitive.NewObjectID(),
 		Name:        "Latte",

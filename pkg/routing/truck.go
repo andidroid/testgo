@@ -10,6 +10,7 @@ import (
 
 	"github.com/andidroid/testgo/pkg/redis"
 	"github.com/andidroid/testgo/pkg/util"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type ActionType int
@@ -28,16 +29,25 @@ const (
 )
 
 type Truck struct {
-	ID         int64      `json:"id" bson:"_id" db:"id"`
-	Name       string     `json:"name" bson:"name" db:"name"`
-	Position   *Position  `json:"pos" bson:"-" db:"-"`
-	Route      *Route     `json:"route" bson:"-" db:"-"`
-	Base       int64      `json:"base" bson:"base" db:"base"`
-	ActionType ActionType `json:"action" bson:"action" db:"-"`
+	ID         primitive.ObjectID `json:"id" bson:"_id" db:"id"`
+	Name       string             `json:"name" bson:"name" db:"name"`
+	Position   *Position          `json:"pos" bson:"-" db:"-"`
+	Route      *Route             `json:"route" bson:"-" db:"-"`
+	Base       *Base              `json:"base" bson:"base" db:"base"`
+	ActionType ActionType         `json:"action" bson:"action" db:"-"`
+}
+
+type Base struct {
+	ID   primitive.ObjectID `json:"id,omitempty" bson:"_id,omitempty" db:"id"`
+	Name string             `json:"name" bson:"name" db:"name"`
+	Geom Geometry           `json:"geometry" bson:"geom"`
 }
 
 func NewTruck(name string) *Truck {
-	return &Truck{ID: 1, Name: name, Base: 84845, ActionType: STOPPED}
+	base := Base{Name: "Start", Geom: Geometry{Type: "Point", Coordinates: []float64{11.50, 52.00}}}
+	position := Position{Lon: base.Geom.Coordinates[0], Lat: base.Geom.Coordinates[1]}
+
+	return &Truck{ID: primitive.NewObjectID(), Name: name, Base: &base, ActionType: STOPPED, Position: &position}
 }
 
 func (truck *Truck) SetActionType(ActionType ActionType) {
@@ -64,7 +74,7 @@ func (truck *Truck) sendTruckActionEvent() {
 
 func (truck *Truck) sendRouteEvent() {
 	re := RouteEvent{
-		ID:    1,
+		ID:    primitive.NewObjectID(),
 		Name:  truck.Name,
 		Route: *truck.Route,
 	}
@@ -74,7 +84,7 @@ func (truck *Truck) sendRouteEvent() {
 }
 
 func (truck *Truck) sendPositionEvent() {
-	pe := PostionEvent{
+	pe := PositionEvent{
 		ID:       truck.ID,
 		Name:     truck.Name,
 		Position: *truck.Position,
@@ -121,9 +131,37 @@ func (truck *Truck) requestNode(nodeId int64) Node {
 
 func (truck *Truck) StartOrder(order *Order) {
 	fmt.Printf("+++ start order %s %s +++", truck.Name, order.Name)
+	fmt.Println("Order: ", order)
+	order.StartTime = time.Now()
+
 	tsp := order.Tsp
 	// TODO: order.Status=RUNNING
-	fmt.Println(tsp.Start)
+
+	fmt.Println("Start: ", tsp.Start)
+
+	fmt.Println("TSP: ", tsp)
+
+	truck.SetActionType(PREPARING)
+	fmt.Println(truck)
+
+	var nearestCurrentNode Node
+
+	url := fmt.Sprintf("http://localhost/node/source?lon=%f&lat=%f", truck.Position.Lon, truck.Position.Lat)
+	fmt.Println(url)
+	resp, err := http.Get(url)
+	util.CheckErr(err)
+	fmt.Println("server GET Node: ", url, resp, err)
+
+	nodeBytes, err := ioutil.ReadAll(resp.Body)
+	util.CheckErr(err)
+	err = json.Unmarshal(nodeBytes, &nearestCurrentNode)
+
+	util.CheckErr(err)
+	fmt.Println("respond Node: ", nearestCurrentNode)
+
+	truck.SetActionType(OUTWARD)
+	truck.runRoute(nearestCurrentNode.ID, tsp.Steps[0].Node)
+
 	truck.SetActionType(STARTED)
 
 	for i := 0; i < len(tsp.Steps)-1; i++ {
@@ -138,28 +176,15 @@ func (truck *Truck) StartOrder(order *Order) {
 		// fmt.Println(route)
 		//
 		//
-		route, err := truck.requestRoute(source, target, i)
+		//
+		//fmt.Printf("coord %d: lon=%f, lat=%f", i, coord[0], coord[1])
+		//PositionEvent
+		//fmt.Println(truck)
+		//time.Sleep(1 * time.Second)
+		err := truck.runRoute(source, target)
 		util.CheckErr(err)
 		if err != nil {
 			return
-		}
-
-		truck.SetRoute(&route)
-
-		//
-
-		truck.SetActionType(RUNNING)
-
-		for i := 0; i < len(route.Coordinates); i++ {
-			coord := route.Coordinates[i]
-			//fmt.Printf("coord %d: lon=%f, lat=%f", i, coord[0], coord[1])
-			truck.Position = &Position{Lon: coord[0], Lat: coord[1]}
-
-			//PositionEvent
-			truck.sendPositionEvent()
-			//fmt.Println(truck)
-			//time.Sleep(1 * time.Second)
-			time.Sleep(100 * time.Millisecond)
 		}
 
 		//{"type":"LineString","coordinates":[[11.6072681,51.7953606],
@@ -173,9 +198,32 @@ func (truck *Truck) StartOrder(order *Order) {
 
 }
 
-func (truck *Truck) requestRoute(source int64, target int64, id int) (Route, error) {
+func (truck *Truck) runRoute(source int64, target int64) error {
+	route, err := truck.requestRoute(source, target)
+	util.CheckErr(err)
+	if err != nil {
+		return err
+	}
 
-	fmt.Println("request Route: ", source, target)
+	truck.SetRoute(&route)
+
+	truck.SetActionType(RUNNING)
+
+	for i := 0; i < len(route.Coordinates); i++ {
+		coord := route.Coordinates[i]
+
+		truck.Position = &Position{Lon: coord[0], Lat: coord[1]}
+
+		truck.sendPositionEvent()
+
+		time.Sleep(100 * time.Millisecond)
+	}
+	return nil
+}
+
+func (truck *Truck) requestRoute(source int64, target int64) (Route, error) {
+
+	fmt.Println("truck.requestRoute: ", source, target)
 	routeKey := fmt.Sprintf("route_%d_%d", source, target)
 
 	var route Route

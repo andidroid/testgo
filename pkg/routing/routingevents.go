@@ -2,23 +2,26 @@ package routing
 
 import (
 	"time"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-type PostionEvent struct {
-	ID       int64     `json:"id" bson:"_id"`
-	Name     string    `json:"name" bson:"name"`
-	Position Position  `json:"pos" bson:"pos"`
-	Time     time.Time `json:"time" bson:"time"`
+type PositionEvent struct {
+	ID       primitive.ObjectID `json:"id" bson:"_id"`
+	Name     string             `json:"name" bson:"name"`
+	Position Position           `json:"pos" bson:"pos"`
+	Time     time.Time          `json:"time" bson:"time"`
 }
 
 type RouteEvent struct {
-	ID    int64  `json:"id" bson:"_id"`
-	Name  string `json:"name" bson:"name"`
-	Route Route  `json:"route" bson:"route"`
+	ID    primitive.ObjectID `json:"id" bson:"_id"`
+	Name  string             `json:"name" bson:"name"`
+	Route Route              `json:"route" bson:"route"`
 }
 
 type TruckActionEvent struct {
-	ID         int64      `json:"id" bson:"_id"`
-	Name       string     `json:"name" bson:"name"`
-	ActionType ActionType `json:"action" bson:"action"`
+	ID         primitive.ObjectID `json:"id" bson:"_id"`
+	Name       string             `json:"name" bson:"name"`
+	ActionType ActionType         `json:"action" bson:"action"`
 }
+
