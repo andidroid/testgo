@@ -170,12 +170,39 @@ func CreateRouter() *gin.Engine {
 	router.GET("/health", healthHandler.HandleGetRequest)
 	router.GET("/metrics", gin.WrapH(promhttp.Handler()))
 
-	router.POST("/tests", testHandler.HandlePostRequest)
-	router.GET("/tests", testHandler.HandleGetAllTestsRequest)
-	router.PUT("/tests/:id", testHandler.HandlePutRequest)
-	router.DELETE("/tests/:id", testHandler.HandleDeleteRequest)
-	router.GET("/tests/:id", testHandler.HandleGetTestByIdRequest)
+	// router.POST("/tests", testHandler.HandlePostRequest)
+	// router.GET("/tests", testHandler.HandleGetAllTestsRequest)
+	// router.PUT("/tests/:id", testHandler.HandlePutRequest)
+	// router.DELETE("/tests/:id", testHandler.HandleDeleteRequest)
+	// router.GET("/tests/:id", testHandler.HandleGetTestByIdRequest)
 
+
+
+	// // Simple group: v2
+	// v2 := router.Group("/v2")
+	// {
+	// 	v2.POST("/login", loginEndpoint)
+	// 	v2.POST("/submit", submitEndpoint)
+	// 	v2.POST("/read", readEndpoint)
+	// }
+
+	router.StaticFile("/map", "./docs/map.html")
+	router.StaticFile("/", "./docs/index.html")
+	router.Static("/assets", "./docs/assets")
+	return router
+}
+
+func AddAllRoutes(router *gin.Engine) {
+	AddRoutingRoutes(router)
+
+	//fleet service
+	// search service
+	AddFleetRoutes(router)
+	AddSearchRoutes(router)
+	AddStreamingRoutes(router)
+}
+
+func AddRoutingRoutes(router *gin.Engine) {
 	// Simple group: v1
 	v1 := router.Group("/routing")
 	{
@@ -194,8 +221,9 @@ func CreateRouter() *gin.Engine {
 		v2.GET("/unknown", handler.GetNodeSearchQuery)
 		v2.GET("/:id", handler.GetNodeById)
 	}
+}
 
-	//fleet service
+func AddFleetRoutes(router *gin.Engine) {
 	v3 := router.Group("/fleet")
 	{
 		v3.GET("/start", handler.HandlePostStartOrderRequest)
@@ -217,31 +245,27 @@ func CreateRouter() *gin.Engine {
 		v3.POST("/place", placeHandler.HandlePostPlaceRequest)
 		v3.PUT("/place/:id", placeHandler.HandlePutPlaceRequest)
 		v3.DELETE("/place/:id", placeHandler.HandleDeletePlaceRequest)
-
-		// search service
-		v3.GET("/search", placesearchHandler.HandleGetSearchRequest)
 	}
+}
 
+
+func AddStreamingRoutes(router *gin.Engine) {
 	// messaging service
 	router.GET("/stream", handler.HeadersMiddleware(), streamHandler.ServeHTTP(), streamHandler.GetPositionStream)
-	// // Simple group: v2
-	// v2 := router.Group("/v2")
-	// {
-	// 	v2.POST("/login", loginEndpoint)
-	// 	v2.POST("/submit", submitEndpoint)
-	// 	v2.POST("/read", readEndpoint)
-	// }
+	
+}
 
-	router.StaticFile("/map", "./docs/map.html")
-	router.StaticFile("/", "./docs/index.html")
-	router.Static("/assets", "./docs/assets")
-	return router
+func AddSearchRoutes(router *gin.Engine) {
+	v3 := router.Group("/search")
+	{
+		v3.GET("/place", placesearchHandler.HandleGetSearchRequest)
+	}
 }
 
 func Start() {
 
 	router := CreateRouter()
-
+	AddAllRoutes(router)
 	router.Run(":80")
 	//router.RunTLS(":443", "certs/localhost.crt", "certs/localhost.key")
 
