@@ -11,7 +11,7 @@ require (
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/lib/pq v1.10.4
 	github.com/prometheus/client_golang v1.12.1
-	github.com/segmentio/kafka-go v0.4.30
+	github.com/segmentio/kafka-go v0.4.31
 	github.com/stretchr/testify v1.7.1
 	github.com/testcontainers/testcontainers-go v0.12.0
 	go.mongodb.org/mongo-driver v1.8.4
