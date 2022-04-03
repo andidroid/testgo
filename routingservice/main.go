@@ -4,9 +4,6 @@ import (
 	"fmt"
 
 	"github.com/andidroid/testgo/pkg/server"
-	// "time"
-	//"channel"
-	// "github.com/andidroid/testgo/pkg/kafka"
 )
 
 func main() {
