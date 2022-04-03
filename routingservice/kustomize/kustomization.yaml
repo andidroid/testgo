@@ -3,7 +3,7 @@ namespace: fleet
 # Example configuration for the webserver
 # at https://github.com/andidroid/testwar
 commonLabels:
-  app: fleetservice
+  app: routingservice
   # app: testgo
   version: 0.1.1-SNAPSHOT
   group: me.andidroid.testgo
