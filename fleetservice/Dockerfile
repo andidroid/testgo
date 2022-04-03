@@ -3,7 +3,7 @@ FROM golang:1.18-alpine AS builder
 WORKDIR /src
 COPY . .
 
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main routingservice/main.go
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main fleetservice/main.go
 
 FROM alpine:latest
 

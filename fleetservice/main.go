@@ -4,16 +4,13 @@ import (
 	"fmt"
 
 	"github.com/andidroid/testgo/pkg/server"
-	// "time"
-	//"channel"
-	// "github.com/andidroid/testgo/pkg/kafka"
 )
 
 func main() {
-	fmt.Println("Run RoutingService Go")
+	fmt.Println("Run FleetService Go")
 
 	router := server.CreateRouter()
-	server.AddRoutingRoutes(router)
+	server.AddFleetRoutes(router)
 
 	router.Run(":80")
 }

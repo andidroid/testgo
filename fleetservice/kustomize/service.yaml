@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: fleet
+  name: fleetservice-service
+  labels:
+    app: fleetservice
+spec:
+  selector:
+    app: fleetservice
+  # type: NodePort
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
+      # nodePort: 32100
+      protocol: TCP
