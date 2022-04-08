@@ -13,8 +13,8 @@ require (
 	github.com/prometheus/client_golang v1.12.1
 	github.com/segmentio/kafka-go v0.4.31
 	github.com/stretchr/testify v1.7.1
+	go.mongodb.org/mongo-driver v1.9.0
 	github.com/testcontainers/testcontainers-go v0.13.0
-	go.mongodb.org/mongo-driver v1.8.4
 	go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin v0.31.0
 	go.opentelemetry.io/contrib/instrumentation/go.mongodb.org/mongo-driver/mongo/otelmongo v0.31.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.31.0
