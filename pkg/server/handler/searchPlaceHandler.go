@@ -68,7 +68,7 @@ func initSubscriber(ctx context.Context, redisearchClient *redisearch.Client) {
 				case routing.MONGO_EVENT_CREATED:
 					fmt.Println("created mongo event: ", pe)
 
-					url := fmt.Sprintf("http://localhost/fleet/place/%s", pe.ID)
+					url := fmt.Sprintf("%s/fleet/place/%s", routing.FLEET_SERVCICE_URL, pe.ID)
 					resp, err := routing.GetClient().Get(url)
 					util.CheckErr(err)
 					fmt.Println("server GET place: ", pe.ID, resp, err)

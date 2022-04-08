@@ -9,7 +9,6 @@ import (
 
 	"github.com/andidroid/testgo/pkg/util"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 )
 
 type OrderState int
@@ -39,9 +38,9 @@ func NewOrder(name string) *Order {
 
 func (order *Order) RequestTSP(startNodeId int) error {
 
-	client := http.Client{Transport: otelhttp.NewTransport(http.DefaultTransport)}
+	client := GetClient()
 	//TODO add ids to request
-	url := fmt.Sprintf("http://localhost/routing/tsp?start=%d", startNodeId)
+	url := fmt.Sprintf("%s/routing/tsp?start=%d", ROUTING_SERVCICE_URL, startNodeId)
 	resp, err := client.Get(url)
 	util.CheckErr(err)
 	// fmt.Printf("calling /routing/tsp?start=84845: %s", resp.Body)

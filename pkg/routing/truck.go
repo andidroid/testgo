@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"net/http"
 	"time"
 
 	"github.com/andidroid/testgo/pkg/redis"
@@ -106,8 +105,9 @@ func (truck *Truck) requestNode(nodeId int64) Node {
 	var nodeBytes []byte
 	if err != nil || nodeString == "" {
 		//request from server
-		url := fmt.Sprintf("http://localhost/node/%d", nodeId)
-		resp, err := http.Get(url)
+		client := GetClient()
+		url := fmt.Sprintf("%s/node/%d", ROUTING_SERVCICE_URL, nodeId)
+		resp, err := client.Get(url)
 		util.CheckErr(err)
 		fmt.Println("server GET Node: ", nodeId, resp, err)
 
@@ -146,9 +146,10 @@ func (truck *Truck) StartOrder(order *Order) {
 
 	var nearestCurrentNode Node
 
-	url := fmt.Sprintf("http://localhost/node/source?lon=%f&lat=%f", truck.Position.Lon, truck.Position.Lat)
+	client := GetClient()
+	url := fmt.Sprintf("%s/node/source?lon=%f&lat=%f", ROUTING_SERVCICE_URL, truck.Position.Lon, truck.Position.Lat)
 	fmt.Println(url)
-	resp, err := http.Get(url)
+	resp, err := client.Get(url)
 	util.CheckErr(err)
 	fmt.Println("server GET Node: ", url, resp, err)
 
@@ -235,8 +236,10 @@ func (truck *Truck) requestRoute(source int64, target int64) (Route, error) {
 
 	if err != nil || routeString == "" {
 		//request from server
-		url := fmt.Sprintf("http://localhost/routing/geometry?source=%d&target=%d", source, target)
-		resp, err := http.Get(url)
+
+		client := GetClient()
+		url := fmt.Sprintf("%s/routing/geometry?source=%d&target=%d", ROUTING_SERVCICE_URL, source, target)
+		resp, err := client.Get(url)
 		util.CheckErr(err)
 		if err != nil {
 			return Route{}, fmt.Errorf("error requesting route: %w", err)
