@@ -56,7 +56,7 @@ func (handler *HealthHandler) HandleGetRequest(c *gin.Context) {
 	redisPingResult, err := redisPing.Result()
 
 	// err != redis.Nil ||
-	if err != nil {
+	if err != nil && err != redis.Nil {
 		foundError = true
 		// subStatus := SubStatus{"DOWN", redisPingResult}
 		var subStatus SubStatus
