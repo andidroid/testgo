@@ -121,7 +121,7 @@ jobs:
           pull: true
           tags: |
             ghcr.io/andidroid/testgo/${{ matrix.service }}:latest
-            ghcr.io/andidroid/testgo/${{ matrix.service }}:${{GITHUB_SHA}}
+            ghcr.io/andidroid/testgo/${{ matrix.service }}:${{env.GITHUB_SHA}}
           cache-from: type=gha
           cache-to: type=gha,mode=max
       - name: Run Trivy vulnerability scanner
