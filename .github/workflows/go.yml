@@ -156,8 +156,8 @@ jobs:
           git checkout "feature/routing"
           cd gorouting-gitops/charts/${{ matrix.service }} 
           ls
-          echo Update Helm chart values.yaml with new image tag
-          yq e -i '.image.tag = ${{github.sha}}' ./values.yaml
+          echo Update Helm chart values.yaml with new image:tag ${{ matrix.service }}:${{github.sha}}
+          yq -i '.image.tag = "${{github.sha}}"' ./values.yaml
           cd ../../
           git config --global user.name github-actions
           git config --global user.email github-actions@github.com
