@@ -84,6 +84,7 @@ jobs:
 
   docker:
     strategy:
+      fail-fast: false
       matrix:
         service:
           - routingservice
