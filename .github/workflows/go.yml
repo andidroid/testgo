@@ -154,9 +154,10 @@ jobs:
       - name: Update image tag in Helm git repo
         run: |
           git clone "https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/andidroid/gorouting-gitops.git"
+          cd gorouting-gitops
           git checkout "feature/routing"
           pwd
-          cd gorouting-gitops/charts/${{ matrix.service }}
+          cd charts/${{ matrix.service }}
           ls
           echo Update Helm chart values.yaml with new image:tag ${{ matrix.service }}:${{github.sha}}
           yq -i '.image.tag = "${{github.sha}}"' values.yaml
