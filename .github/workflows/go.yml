@@ -158,7 +158,7 @@ jobs:
           cd gorouting-gitops
           ls
           echo Update Helm chart values.yaml with new image:tag ${{ matrix.service }}:${{github.sha}}
-          yq -i '.image.tag = "${{github.sha}}"' ./charts/${{ matrix.service }} /values.yaml
+          yq -i '.image.tag = "${{github.sha}}"' ./charts/${{ matrix.service }}/values.yaml
           git config --global user.name github-actions
           git config --global user.email github-actions@github.com
           git add .  
