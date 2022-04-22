@@ -159,6 +159,7 @@ jobs:
           ls
           echo Update Helm chart values.yaml with new image:tag ${{ matrix.service }}:${{github.sha}}
           yq -i '.image.tag = "${{github.sha}}"' values.yaml
+          git config --unset-all http.https://github.com/.extraheader
           git config --global user.name github-actions
           git config --global user.email github-actions@github.com
           git add .  
