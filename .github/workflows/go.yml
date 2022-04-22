@@ -141,18 +141,18 @@ jobs:
         if: always()
         with:
           sarif_file: "trivy-results.sarif"
-      - name: Install yq 
+      - name: Install yq
         run: |
           wget https://github.com/mikefarah/yq/releases/download/v4.24.5/yq_linux_amd64 -O /usr/bin/yq && chmod +x /usr/bin/yq
           yq --version
-      # - name: Install yq 
+      # - name: Install yq
       #   uses: mikefarah/yq@master
       #   with:
       #     cmd: yq -i '.foo.bar = "cool"' 'config.yml'
 
-      - name: Update image tag in Helm git repo 
-        run: | 
-          git clone "https://github-actions:${GITHUB_TOKEN}@github.com/andidroid/gorouting-gitops.git"
+      - name: Update image tag in Helm git repo
+        run: |
+          git clone "https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/andidroid/gorouting-gitops.git"
           git checkout "feature/routing"
           cd gorouting-gitops/charts/${{ matrix.service }} 
           ls
@@ -166,7 +166,6 @@ jobs:
           git push
         env:
           GITHUB_TOKEN: ${{ github.token }}
-
 
   lint:
     name: Linter
