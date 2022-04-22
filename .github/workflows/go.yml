@@ -164,6 +164,7 @@ jobs:
 
       - name: Update image tag in Helm git repo
         run: |
+          cd gorouting-gitops
           cd charts/${{ matrix.service }}
           ls
           echo Update Helm chart values.yaml with new image:tag ${{ matrix.service }}:${{github.sha}}
