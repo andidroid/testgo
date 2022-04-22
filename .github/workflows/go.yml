@@ -162,15 +162,15 @@ jobs:
           echo Update Helm chart values.yaml with new image:tag ${{ matrix.service }}:${{github.sha}}
           set -x
           yq -i '.image.tag = "${{github.sha}}"' ./values.yaml
-          git config --list
-          git config --unset-all "http.https://github.com/.extraheader"
-          git config --global user.name github-actions
-          git config --global user.email github-actions@github.com
+          git config --global user.name ${{ GIT_USER_NAME }}
+          git config --global user.email ${{ GIT_USER_MAIL }}
           git add .  
           git commit -m "set ${{ matrix.service }} image tag to ${{github.sha}}" 
           git push
         env:
           GITHUB_TOKEN: ${{ github.token }}
+          GIT_USER_NAME: ${{ secrets.GIT_USER_NAME }}
+          GIT_USER_MAIL: ${{ secrets.GIT_USER_MAIL }}
 
   lint:
     name: Linter
