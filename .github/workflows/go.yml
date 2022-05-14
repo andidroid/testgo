@@ -82,7 +82,14 @@ jobs:
           # Path to SARIF file relative to the root of the repository
           sarif_file: results.sarif
 
-  routingservice-docker:
+  docker:
+    strategy:
+      matrix:
+        service:
+          - routingservice
+          - fleetservice
+          - searchservice
+          - messagingservice
     permissions:
       contents: read # for actions/checkout to fetch code
       security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
@@ -108,15 +115,18 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v3
         with:
-          file: ./routingservice/Dockerfile
+          file: ./${{ matrix.service }}/Dockerfile
           context: .
           push: true
           pull: true
-          tags: ghcr.io/andidroid/testgo/routingservice:latest
+          tags: |
+            ghcr.io/andidroid/testgo/${{ matrix.service }}:latest
+            ghcr.io/andidroid/testgo/${{ matrix.service }}:${GITHUB_SHA::7}
           cache-from: type=gha
           cache-to: type=gha,mode=max
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
+        continue-on-error: true
         with:
           image-ref: "ghcr.io/andidroid/testgo/routingservice:latest"
           format: "table"
@@ -274,6 +284,7 @@ jobs:
           output: "trivy-results.sarif"
       - name: Upload Trivy scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v1
+        continue-on-error: true
         if: always()
         with:
           sarif_file: "trivy-results.sarif"
