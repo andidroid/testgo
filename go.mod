@@ -5,6 +5,7 @@ go 1.17
 require (
 	github.com/RediSearch/redisearch-go v1.1.1
 	github.com/blockloop/scan v1.3.0
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gin-contrib/cors v1.3.1
 	github.com/gin-gonic/gin v1.8.1
 	github.com/go-playground/validator v9.31.0+incompatible
@@ -24,12 +25,15 @@ require (
 	go.opentelemetry.io/otel/sdk v1.7.0
 	google.golang.org/grpc v1.47.0
 	google.golang.org/protobuf v1.28.0
+	gorm.io/driver/postgres v1.3.5
+	gorm.io/gorm v1.23.5
+	gorm.io/plugin/prometheus v0.0.0-20220414034526-3a4b06c41cbf
 )
 
 require (
-	github.com/Azure/go-ansiterm v0.0.0-20170929234023-d6e3b3328b78 // indirect
-	github.com/Microsoft/go-winio v0.4.17-0.20210211115548-6eac466e5fa3 // indirect
-	github.com/Microsoft/hcsshim v0.8.16 // indirect
+	github.com/Azure/go-ansiterm v0.0.0-20210617225240-d185dfc1b5a1 // indirect
+	github.com/Microsoft/go-winio v0.4.17 // indirect
+	github.com/Microsoft/hcsshim v0.8.23 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cenkalti/backoff/v4 v4.1.2 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
@@ -57,6 +61,16 @@ require (
 	github.com/golang/snappy v0.0.1 // indirect
 	github.com/gomodule/redigo v1.8.3 // indirect
 	github.com/google/uuid v1.3.0 // indirect
+	github.com/jackc/chunkreader/v2 v2.0.1 // indirect
+	github.com/jackc/pgconn v1.12.0 // indirect
+	github.com/jackc/pgio v1.0.0 // indirect
+	github.com/jackc/pgpassfile v1.0.0 // indirect
+	github.com/jackc/pgproto3/v2 v2.3.0 // indirect
+	github.com/jackc/pgservicefile v0.0.0-20200714003250-2b9c44734f2b // indirect
+	github.com/jackc/pgtype v1.11.0 // indirect
+	github.com/jackc/pgx/v4 v4.16.0 // indirect
+	github.com/jinzhu/inflection v1.0.0 // indirect
+	github.com/jinzhu/now v1.1.4 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/klauspost/compress v1.14.2 // indirect
 	github.com/leodido/go-urn v1.2.1 // indirect
@@ -94,7 +108,6 @@ require (
 	golang.org/x/sys v0.0.0-20220319134239-a9b59b0215f8 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	google.golang.org/genproto v0.0.0-20201110150050-8816d57aaa9a // indirect
-	google.golang.org/grpc v1.45.0 // indirect
 	google.golang.org/protobuf v1.28.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
