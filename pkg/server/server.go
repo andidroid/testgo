@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"github.com/andidroid/testgo/pkg/redis"
 	"github.com/andidroid/testgo/pkg/redis/search"
@@ -167,6 +168,9 @@ func CreateRouter() *gin.Engine {
 
 	router.Use(cors.Default())
 
+	router.Use(Logger())
+	router.Use(handler.AuthMiddleware())
+
 	router.GET("/health", healthHandler.HandleGetRequest)
 	router.GET("/metrics", gin.WrapH(promhttp.Handler()))
 
@@ -175,8 +179,6 @@ func CreateRouter() *gin.Engine {
 	// router.PUT("/tests/:id", testHandler.HandlePutRequest)
 	// router.DELETE("/tests/:id", testHandler.HandleDeleteRequest)
 	// router.GET("/tests/:id", testHandler.HandleGetTestByIdRequest)
-
-
 
 	// // Simple group: v2
 	// v2 := router.Group("/v2")
@@ -209,6 +211,8 @@ func AddRoutingRoutes(router *gin.Engine) {
 		v1.GET("/tsp", handler.GetTSP)
 		v1.GET("/list", handler.GetRouteAsList)
 		v1.GET("/geometry", handler.GetRouteAsGeometry)
+
+		v1.GET("/info", handler.GetRouteInformation)
 		v1.GET("/poi", handler.GetPOIs)
 		v1.GET("/poi/:osm_id/node", handler.GetNearestNode)
 
@@ -248,11 +252,10 @@ func AddFleetRoutes(router *gin.Engine) {
 	}
 }
 
-
 func AddStreamingRoutes(router *gin.Engine) {
 	// messaging service
 	router.GET("/stream", handler.HeadersMiddleware(), streamHandler.ServeHTTP(), streamHandler.GetPositionStream)
-	
+
 }
 
 func AddSearchRoutes(router *gin.Engine) {
@@ -279,3 +282,16 @@ func Start() {
 // 	AllowCredentials: true,
 // 	MaxAge: 12 * time.Hour,
 //  }))
+
+func Logger() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		t := time.Now()
+		// before request
+		c.Next()
+		// after request
+		latency := time.Since(t)
+		// access the status we are sending
+		status := c.Writer.Status()
+		log.Println("response:", status, latency)
+	}
+}

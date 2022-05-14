@@ -3,7 +3,7 @@ version: "3.9"
 services:
   redis-server:
     # image: "redis:alpine"
-    image: redislabs/redisearch:latest
+    image: docker.io/redislabs/redisearch:latest
     command: redis-server --loadmodule /usr/lib/redis/modules/redisearch.so
     #  --loadmodule /usr/lib/redis/modules/rejson.so
     ports:
@@ -12,7 +12,7 @@ services:
     #   - /data:/data
 
   jaeger:
-    image: jaegertracing/all-in-one:latest
+    image: docker.io/jaegertracing/all-in-one:latest
     ports:
       - "6831:6831/udp"
       - "16686:16686"

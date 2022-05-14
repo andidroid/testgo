@@ -170,6 +170,7 @@ jobs:
           echo Update Helm chart values.yaml with new image:tag ${{ matrix.service }}:${{github.sha}}
           set -x
           yq -i '.image.tag = "${{github.sha}}"' ./values.yaml
+          yq -i '.version = "${{github.sha}}"' Chart.yaml
           git config --global user.name $GIT_USER_NAME
           git config --global user.email $GIT_USER_MAIL
           git add .  

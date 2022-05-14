@@ -225,7 +225,7 @@ func (truck *Truck) runRoute(source int64, target int64) error {
 func (truck *Truck) requestRoute(source int64, target int64) (Route, error) {
 
 	fmt.Println("truck.requestRoute: ", source, target)
-	routeKey := fmt.Sprintf("route_%d_%d", source, target)
+	routeKey := fmt.Sprintf("route_geometry_%d_%d", source, target)
 
 	var route Route
 	routeString, err := redis.GetClient().Get(context.Background(), routeKey).Result()
