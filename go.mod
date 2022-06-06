@@ -12,7 +12,7 @@ require (
 	github.com/lib/pq v1.10.6
 	github.com/prometheus/client_golang v1.12.2
 	github.com/segmentio/kafka-go v0.4.31
-	github.com/stretchr/testify v1.7.1
+	github.com/stretchr/testify v1.7.2
 	github.com/testcontainers/testcontainers-go v0.13.0
 	go.mongodb.org/mongo-driver v1.9.1
 	go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin v0.32.0
@@ -91,5 +91,5 @@ require (
 	golang.org/x/text v0.3.7 // indirect
 	google.golang.org/genproto v0.0.0-20201110150050-8816d57aaa9a // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
-	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
