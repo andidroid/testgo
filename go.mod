@@ -13,7 +13,6 @@ require (
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/lib/pq v1.10.6
 	github.com/prometheus/client_golang v1.12.2
-	github.com/segmentio/kafka-go v0.4.32
 	github.com/stretchr/testify v1.7.2
 	github.com/testcontainers/testcontainers-go v0.13.0
 	go.mongodb.org/mongo-driver v1.9.1
@@ -24,7 +23,6 @@ require (
 	go.opentelemetry.io/otel/exporters/jaeger v1.7.0
 	go.opentelemetry.io/otel/sdk v1.7.0
 	google.golang.org/grpc v1.47.0
-	google.golang.org/protobuf v1.28.0
 	gorm.io/driver/postgres v1.3.5
 	gorm.io/gorm v1.23.5
 	gorm.io/plugin/prometheus v0.0.0-20220414034526-3a4b06c41cbf
@@ -87,7 +85,6 @@ require (
 	github.com/opencontainers/image-spec v1.0.2 // indirect
 	github.com/opencontainers/runc v1.0.2 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.1 // indirect
-	github.com/pierrec/lz4/v4 v4.1.14 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/prometheus/client_model v0.2.0 // indirect
