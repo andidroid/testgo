@@ -155,7 +155,7 @@ jobs:
       #     cmd: yq -i '.foo.bar = "cool"' 'config.yml'
       - name: Install semver-tool
         run: |
-          wget https://raw.githubusercontent.com/fsaintjacques/semver-tool/3.4.0/src/semver -O /usr/bin/semver && chmod +x /usr/bin/semver
+          wget https://raw.githubusercontent.com/fsaintjacques/semver-tool/3.4.0/src/semver -O /usr/local/bin/semver && chmod +x /usr/local/bin/semver
           semver --version
 
       - name: Checkout private tools
@@ -174,9 +174,9 @@ jobs:
           echo Update Helm chart values.yaml with new image:tag ${{ matrix.service }}:${{github.sha}}
           set -x
           yq -i '.image.tag = "${{github.sha}}"' ./values.yaml
-          VERSION=yq '.version'
-          VERSION=semver bump prerelease ${{github.sha}} $VERSION
-          yq -i '.version = $VERSION' Chart.yaml
+          VERSION=$( yq '.version' )
+          VERSION=$( semver bump prerelease ${{github.sha}} $VERSION)
+          yq -i '.version = strenv(VERSION)' Chart.yaml
           yq -i '.appVersion = "${{github.sha}}"' Chart.yaml
           git config --global user.name $GIT_USER_NAME
           git config --global user.email $GIT_USER_MAIL
