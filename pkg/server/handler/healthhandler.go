@@ -54,8 +54,10 @@ func (handler *HealthHandler) HandleGetRequest(c *gin.Context) {
 
 	redisPing := handler.redisClient.Ping(handler.ctx)
 	redisPingResult, err := redisPing.Result()
+	// err = redisPing.Err()
 
-	if err != redis.Nil || err != nil {
+	// err != redis.Nil ||
+	if err != nil {
 		foundError = true
 		// subStatus := SubStatus{"DOWN", redisPingResult}
 		var subStatus SubStatus
@@ -97,6 +99,6 @@ func (handler *HealthHandler) HandleGetRequest(c *gin.Context) {
 		status.Message = ""
 		status.Substatus = subStatusList
 		fmt.Printf("health %s", status)
-		c.JSON(http.StatusInternalServerError, status)
+		c.JSON(http.StatusOK, status)
 	}
 }

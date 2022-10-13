@@ -1,23 +1,27 @@
-version: '3.9'
+version: "3.9"
 
 services:
   redis-server:
-    image: "redis:alpine"
-    command: redis-server
+    # image: "redis:alpine"
+    image: docker.io/redislabs/redisearch:latest
+    command: redis-server --loadmodule /usr/lib/redis/modules/redisearch.so
+    #  --loadmodule /usr/lib/redis/modules/rejson.so
     ports:
       - "6379:6379"
+    # volumes:
+    #   - /data:/data
 
   jaeger:
-    image: jaegertracing/all-in-one:latest
+    image: docker.io/jaegertracing/all-in-one:latest
     ports:
       - "6831:6831/udp"
       - "16686:16686"
       - "14268:14268"
 
-  mongodb:
-    image: mongo:5
-    ports:
-      - 27017:27017
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=test
-      - MONGO_INITDB_ROOT_PASSWORD=test
+  # mongodb:
+  #   image: mongo:5
+  #   ports:
+  #     - 27017:27017
+  #   environment:
+  #     - MONGO_INITDB_ROOT_USERNAME=test
+  #     - MONGO_INITDB_ROOT_PASSWORD=test

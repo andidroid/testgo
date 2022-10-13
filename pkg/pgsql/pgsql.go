@@ -13,14 +13,22 @@ var connection *sql.DB
 
 func init() {
 	var err error
-	connection, err = InitDB()
+
+	host := util.LookupEnv("POSTGRES_HOST", "localhost")
+	port := 5432
+	user := "postgres"
+	password := "postgres"
+	dbname := "osm"
+	// schema := "public"
+	var connectionString = fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
+		host, port, user, password, dbname)
+
+	connection, err = InitDB(connectionString)
 	util.CheckErr(err)
 }
 
-func InitDB() (*sql.DB, error) {
+func InitDB(connectionString string) (*sql.DB, error) {
 	fmt.Println("create database connection")
-	var connectionString = fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
-		host, port, user, password, dbname)
 
 	// var err error
 	db, err := sql.Open("postgres", connectionString)
@@ -35,15 +43,6 @@ func InitDB() (*sql.DB, error) {
 func main() {
 
 }
-
-const (
-	host     = "127.0.0.1"
-	port     = 5432
-	user     = "postgres"
-	password = "postgres"
-	dbname   = "osm"
-	schema   = "public"
-)
 
 func GetConnection() (*sql.DB, error) {
 	return connection, nil

@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"github.com/andidroid/testgo/pkg/redis"
+	"github.com/andidroid/testgo/pkg/redis/search"
 	"github.com/andidroid/testgo/pkg/server/handler"
 	"github.com/gin-contrib/cors"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -31,6 +33,11 @@ var testHandler *handler.TestHandler
 var streamHandler *handler.EventStreamHandler
 var healthHandler *handler.HealthHandler
 
+var truckHandler *handler.TruckHandler
+var placeHandler *handler.PlaceHandler
+var orderHandler *handler.OrderHandler
+var placesearchHandler *handler.SearchPlaceHandler
+
 func init() {
 
 	logger := log.New(os.Stdout, "gin-server", log.LstdFlags)
@@ -40,7 +47,11 @@ func init() {
 
 	//
 
-	exp, err := jaeger.New(jaeger.WithCollectorEndpoint(jaeger.WithEndpoint("http://localhost:14268/api/traces")))
+	// OTEL_EXPORTER_JAEGER_ENDPOINT default "http://localhost:14268/api/traces"
+	// OTEL_EXPORTER_JAEGER_USER
+	// OTEL_EXPORTER_JAEGER_PASSWORD
+	//jaeger.WithCollectorEndpoint(jaeger.WithEndpoint("http://localhost:14268/api/traces"))
+	exp, err := jaeger.New(jaeger.WithCollectorEndpoint())
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -96,6 +107,7 @@ func init() {
 	mongoDatabase := mongoClient.Database("test")
 
 	redisClient := redis.CreateClient()
+	redisSearchClient := search.CreateClient()
 
 	//Add distributed tracing to redis client
 	//go get github.com/go-redis/redis/extra/redisotel/v8
@@ -107,6 +119,11 @@ func init() {
 	healthHandler = handler.NewHealthHandler(ctx, logger, mongoDatabase, redisClient)
 	testHandler = handler.NewTestHandler(ctx, logger, mongoDatabase, redisClient)
 	streamHandler = handler.NewEventStreamHandler()
+
+	truckHandler = handler.NewTruckHandler(ctx, logger, mongoDatabase, redisClient)
+	placeHandler = handler.NewPlaceHandler(ctx, logger, mongoDatabase, redisClient)
+	orderHandler = handler.NewOrderHandler(ctx, logger, mongoDatabase, redisClient)
+	placesearchHandler = handler.NewSearchPlaceHandler(ctx, logger, redisSearchClient)
 }
 
 func CreateRouter() *gin.Engine {
@@ -151,40 +168,18 @@ func CreateRouter() *gin.Engine {
 
 	router.Use(cors.Default())
 
+	router.Use(Logger())
+	router.Use(handler.AuthMiddleware())
+
 	router.GET("/health", healthHandler.HandleGetRequest)
 	router.GET("/metrics", gin.WrapH(promhttp.Handler()))
 
-	router.POST("/tests", testHandler.HandlePostRequest)
-	router.GET("/tests", testHandler.HandleGetAllTestsRequest)
-	router.PUT("/tests/:id", testHandler.HandlePutRequest)
-	router.DELETE("/tests/:id", testHandler.HandleDeleteRequest)
-	router.GET("/tests/:id", testHandler.HandleGetTestByIdRequest)
+	// router.POST("/tests", testHandler.HandlePostRequest)
+	// router.GET("/tests", testHandler.HandleGetAllTestsRequest)
+	// router.PUT("/tests/:id", testHandler.HandlePutRequest)
+	// router.DELETE("/tests/:id", testHandler.HandleDeleteRequest)
+	// router.GET("/tests/:id", testHandler.HandleGetTestByIdRequest)
 
-	// Simple group: v1
-	v1 := router.Group("/routing")
-	{
-		v1.GET("/tsp", handler.GetTSP)
-		v1.GET("/list", handler.GetRouteAsList)
-		v1.GET("/geometry", handler.GetRouteAsGeometry)
-		v1.GET("/poi", handler.GetPOIs)
-		v1.GET("/poi/:osm_id/node", handler.GetNearestNode)
-
-	}
-	v2 := router.Group("/node")
-	{
-		v2.GET("/source", handler.GetNodeSearchSource)
-		v2.GET("/target", handler.GetNodeSearchTarget)
-		v2.GET("/unknown", handler.GetNodeSearchQuery)
-		v2.GET("/:id", handler.GetNodeById)
-	}
-
-	v3 := router.Group("/fleet")
-	{
-		v3.GET("/start", handler.HandlePostStartOrderRequest)
-
-	}
-
-	router.GET("/stream", handler.HeadersMiddleware(), streamHandler.ServeHTTP(), streamHandler.GetPositionStream)
 	// // Simple group: v2
 	// v2 := router.Group("/v2")
 	// {
@@ -199,10 +194,81 @@ func CreateRouter() *gin.Engine {
 	return router
 }
 
+func AddAllRoutes(router *gin.Engine) {
+	AddRoutingRoutes(router)
+
+	//fleet service
+	// search service
+	AddFleetRoutes(router)
+	AddSearchRoutes(router)
+	AddStreamingRoutes(router)
+}
+
+func AddRoutingRoutes(router *gin.Engine) {
+	// Simple group: v1
+	v1 := router.Group("/routing")
+	{
+		v1.GET("/tsp", handler.GetTSP)
+		v1.GET("/list", handler.GetRouteAsList)
+		v1.GET("/geometry", handler.GetRouteAsGeometry)
+
+		v1.GET("/info", handler.GetRouteInformation)
+		v1.GET("/poi", handler.GetPOIs)
+		v1.GET("/poi/:osm_id/node", handler.GetNearestNode)
+
+	}
+
+	v2 := router.Group("/node")
+	{
+		v2.GET("/source", handler.GetNodeSearchSource)
+		v2.GET("/target", handler.GetNodeSearchTarget)
+		v2.GET("/unknown", handler.GetNodeSearchQuery)
+		v2.GET("/:id", handler.GetNodeById)
+	}
+}
+
+func AddFleetRoutes(router *gin.Engine) {
+	v3 := router.Group("/fleet")
+	{
+		v3.GET("/start", handler.HandlePostStartOrderRequest)
+
+		v3.GET("/truck", truckHandler.HandleGetAllTrucksRequest)
+		v3.GET("/truck/:id", truckHandler.HandleGetTruckByIdRequest)
+		v3.POST("/truck", truckHandler.HandlePostTruckRequest)
+		v3.PUT("/truck/:id", truckHandler.HandlePutTruckRequest)
+		v3.DELETE("/truck/:id", truckHandler.HandleDeleteTruckRequest)
+
+		v3.GET("/order", orderHandler.HandleGetAllOrdersRequest)
+		v3.GET("/order/:id", orderHandler.HandleGetOrderByIdRequest)
+		v3.POST("/order", orderHandler.HandlePostOrderRequest)
+		v3.PUT("/order/:id", orderHandler.HandlePutOrderRequest)
+		v3.DELETE("/order/:id", orderHandler.HandleDeleteOrderRequest)
+
+		v3.GET("/place", placeHandler.HandleGetAllPlacesRequest)
+		v3.GET("/place/:id", placeHandler.HandleGetPlaceByIdRequest)
+		v3.POST("/place", placeHandler.HandlePostPlaceRequest)
+		v3.PUT("/place/:id", placeHandler.HandlePutPlaceRequest)
+		v3.DELETE("/place/:id", placeHandler.HandleDeletePlaceRequest)
+	}
+}
+
+func AddStreamingRoutes(router *gin.Engine) {
+	// messaging service
+	router.GET("/stream", handler.HeadersMiddleware(), streamHandler.ServeHTTP(), streamHandler.GetPositionStream)
+
+}
+
+func AddSearchRoutes(router *gin.Engine) {
+	v3 := router.Group("/search")
+	{
+		v3.GET("/place", placesearchHandler.HandleGetSearchRequest)
+	}
+}
+
 func Start() {
 
 	router := CreateRouter()
-
+	AddAllRoutes(router)
 	router.Run(":80")
 	//router.RunTLS(":443", "certs/localhost.crt", "certs/localhost.key")
 
@@ -216,3 +282,16 @@ func Start() {
 // 	AllowCredentials: true,
 // 	MaxAge: 12 * time.Hour,
 //  }))
+
+func Logger() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		t := time.Now()
+		// before request
+		c.Next()
+		// after request
+		latency := time.Since(t)
+		// access the status we are sending
+		status := c.Writer.Status()
+		log.Println("response:", status, latency)
+	}
+}

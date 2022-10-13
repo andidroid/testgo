@@ -28,5 +28,5 @@ type StartOrderRequest struct {
 func HandlePostStartOrderRequest(c *gin.Context) {
 	var StartOrderRequest StartOrderRequest
 	c.Bind(&StartOrderRequest)
-	routing.GetINSTANCE().StartOrder(StartOrderRequest.Order, StartOrderRequest.Truck, StartOrderRequest.Start)
+	routing.GetFleetInstance().StartOrder(StartOrderRequest.Order, StartOrderRequest.Truck, StartOrderRequest.Start)
 }
