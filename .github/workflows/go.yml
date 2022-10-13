@@ -160,7 +160,7 @@ jobs:
           repository: andidroid/gorouting-gitops
           token: ${{ secrets.ANDIDROID_PACKAGES }} # `GH_PAT` is a secret that contains your PAT
           path: gorouting-gitops
-          ref: feature/routing
+          ref: ${{ github.ref }} #feature/routing
 
       - name: Update image tag in Helm git repo
         run: |
