@@ -165,14 +165,23 @@ jobs:
           TAGS: ${{ steps.docker_meta.outputs.tags }}
           COSIGN_PRIVATE_KEY: ${{secrets.COSIGN_PRIVATE_KEY}}
           COSIGN_PASSWORD: ${{secrets.COSIGN_PASSWORD}}
+# TODO use Github Action for yq
+#      - name: Set foobar to cool
+#        uses: mikefarah/yq@master
+#        with:
+#          cmd: yq -i '.foo.bar = "cool"' 'config.yml'
       - name: Install yq
         run: |
-          wget https://github.com/mikefarah/yq/releases/download/v4.24.5/yq_linux_amd64 -O /usr/bin/yq && chmod +x /usr/bin/yq
+          wget https://github.com/mikefarah/yq/releases/download/v4.28.1/yq_linux_amd64 -O /usr/bin/yq && chmod +x /usr/bin/yq
           yq --version
       # - name: Install yq
       #   uses: mikefarah/yq@master
       #   with:
       #     cmd: yq -i '.foo.bar = "cool"' 'config.yml'
+      - name: Install semver-tool
+        run: |
+          wget https://raw.githubusercontent.com/fsaintjacques/semver-tool/3.4.0/src/semver -O /usr/local/bin/semver && chmod +x /usr/local/bin/semver
+          semver --version
 
       - name: Checkout private tools
         uses: actions/checkout@v3
@@ -190,12 +199,17 @@ jobs:
           echo Update Helm chart values.yaml with new image:tag ${{ matrix.service }}:${{github.sha}}
           set -x
           yq -i '.image.tag = "${{github.sha}}"' ./values.yaml
-          yq -i '.version = "${{github.sha}}"' Chart.yaml
           git config --global user.name $GIT_USER_NAME
           git config --global user.email $GIT_USER_MAIL
           git add .  
           git commit -m "set ${{ matrix.service }} image tag to ${{github.sha}}" 
           git push
+        # TODO: push in feature branch and create merge request
+        # VERSION=$( yq '.version' Chart.yaml)
+        # VERSION=$( semver bump prerelease ${{github.sha}} $VERSION)
+        # yq -i '.version = strenv(VERSION)' Chart.yaml
+        # yq -i '.appVersion = "${{github.sha}}"' Chart.yaml
+        # cat Chart.yaml
         env:
           GITHUB_TOKEN: ${{ secrets.ANDIDROID_PACKAGES }}
           GIT_USER_NAME: ${{ secrets.GIT_USER_NAME }}
