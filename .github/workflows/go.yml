@@ -124,8 +124,8 @@ jobs:
         with:
           images: ghcr.io/andidroid/testgo/${{ matrix.service }}
           tags: |
-            type=sha
-            type=sha,format=long
+            type=sha,prefix=,suffix=
+            type=sha,format=long,prefix=,suffix=
             type=ref,event=branch
             type=ref,event=pr
             type=semver,pattern={{version}}
