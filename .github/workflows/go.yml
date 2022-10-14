@@ -179,17 +179,17 @@ jobs:
           echo Update Helm chart values.yaml with new image:tag ${{ matrix.service }}:${{github.sha}}
           set -x
           yq -i '.image.tag = "${{github.sha}}"' ./values.yaml
-        # VERSION=$( yq '.version' Chart.yaml)
-        # VERSION=$( semver bump prerelease ${{github.sha}} $VERSION)
-        # yq -i '.version = strenv(VERSION)' Chart.yaml
-        # yq -i '.appVersion = "${{github.sha}}"' Chart.yaml
-        # cat Chart.yaml
           git config --global user.name $GIT_USER_NAME
           git config --global user.email $GIT_USER_MAIL
           git add .  
           git commit -m "set ${{ matrix.service }} image tag to ${{github.sha}}" 
           git push
         # TODO: push in feature branch and create merge request
+        # VERSION=$( yq '.version' Chart.yaml)
+        # VERSION=$( semver bump prerelease ${{github.sha}} $VERSION)
+        # yq -i '.version = strenv(VERSION)' Chart.yaml
+        # yq -i '.appVersion = "${{github.sha}}"' Chart.yaml
+        # cat Chart.yaml
         env:
           GITHUB_TOKEN: ${{ secrets.ANDIDROID_PACKAGES }}
           GIT_USER_NAME: ${{ secrets.GIT_USER_NAME }}
