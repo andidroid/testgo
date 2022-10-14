@@ -108,6 +108,8 @@ jobs:
       #   with:
       #     name: testgo-artifact
       #     path: testgo
+      - name: Install Cosign
+        uses: sigstore/cosign-installer@main
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
       - name: Login to GitHub Container Registry
@@ -116,6 +118,18 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      # docker metadata for cosign
+      - id: docker_meta
+        uses: docker/metadata-action@v4.1.0
+        with:
+          images: ghcr.io/andidroid/testgo/${{ matrix.service }}
+          tags: |
+            type=sha
+            type=sha,format=long
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=raw,value=latest,enable={{is_default_branch}}
       - name: Build and push Docker image
         uses: docker/build-push-action@v3
         with:
@@ -123,11 +137,10 @@ jobs:
           context: .
           push: true
           pull: true
-          tags: |
-            ghcr.io/andidroid/testgo/${{ matrix.service }}:latest
-            ghcr.io/andidroid/testgo/${{ matrix.service }}:${{github.sha}}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          tags: ${{ steps.docker_meta.outputs.tags }}
+          labels: ${{ steps.docker_meta.outputs.labels }}
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
         continue-on-error: true
@@ -145,6 +158,13 @@ jobs:
         if: always()
         with:
           sarif_file: "trivy-results.sarif"
+      - name: Sign image with a key
+        run: |
+          cosign sign --key env://COSIGN_PRIVATE_KEY ${TAGS}
+        env:
+          TAGS: ${{ steps.docker_meta.outputs.tags }}
+          COSIGN_PRIVATE_KEY: ${{secrets.COSIGN_PRIVATE_KEY}}
+          COSIGN_PASSWORD: ${{secrets.COSIGN_PASSWORD}}
       - name: Install yq
         run: |
           wget https://github.com/mikefarah/yq/releases/download/v4.24.5/yq_linux_amd64 -O /usr/bin/yq && chmod +x /usr/bin/yq
