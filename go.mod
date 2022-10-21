@@ -18,8 +18,8 @@ require (
 	go.mongodb.org/mongo-driver v1.10.3
 	go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin v0.36.3
 	go.opentelemetry.io/contrib/instrumentation/go.mongodb.org/mongo-driver/mongo/otelmongo v0.36.3
-	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.36.3
-	go.opentelemetry.io/otel v1.11.0
+	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.36.4
+	go.opentelemetry.io/otel v1.11.1
 	go.opentelemetry.io/otel/exporters/jaeger v1.11.0
 	go.opentelemetry.io/otel/sdk v1.11.0
 )
@@ -83,8 +83,8 @@ require (
 	github.com/xdg-go/stringprep v1.0.3 // indirect
 	github.com/youmark/pkcs8 v0.0.0-20181117223130-1be2e3e5546d // indirect
 	go.opencensus.io v0.23.0 // indirect
-	go.opentelemetry.io/otel/metric v0.32.3 // indirect
-	go.opentelemetry.io/otel/trace v1.11.0 // indirect
+	go.opentelemetry.io/otel/metric v0.33.0 // indirect
+	go.opentelemetry.io/otel/trace v1.11.1 // indirect
 	golang.org/x/crypto v0.0.0-20220722155217-630584e8d5aa // indirect
 	golang.org/x/net v0.0.0-20220706163947-c90051bbdb60 // indirect
 	golang.org/x/sync v0.0.0-20220601150217-0de741cfad7f // indirect
