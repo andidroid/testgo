@@ -11,7 +11,7 @@ require (
 	github.com/go-playground/validator v9.31.0+incompatible
 	github.com/go-redis/redis/extra/redisotel/v8 v8.11.5
 	github.com/go-redis/redis/v8 v8.11.5
-	github.com/lib/pq v1.10.8
+	github.com/lib/pq v1.10.9
 	github.com/prometheus/client_golang v1.15.0
 	github.com/stretchr/testify v1.8.2
 	github.com/testcontainers/testcontainers-go v0.19.0
