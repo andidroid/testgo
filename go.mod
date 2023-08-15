@@ -14,7 +14,7 @@ require (
 	github.com/lib/pq v1.10.9
 	github.com/prometheus/client_golang v1.16.0
 	github.com/stretchr/testify v1.8.4
-	github.com/testcontainers/testcontainers-go v0.22.0
+	github.com/testcontainers/testcontainers-go v0.23.0
 	go.mongodb.org/mongo-driver v1.12.1
 	go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin v0.42.0
 	go.opentelemetry.io/contrib/instrumentation/go.mongodb.org/mongo-driver/mongo/otelmongo v0.42.0
@@ -94,7 +94,7 @@ require (
 	golang.org/x/mod v0.9.0 // indirect
 	golang.org/x/net v0.10.0 // indirect
 	golang.org/x/sync v0.2.0 // indirect
-	golang.org/x/sys v0.8.0 // indirect
+	golang.org/x/sys v0.11.0 // indirect
 	golang.org/x/text v0.9.0 // indirect
 	golang.org/x/tools v0.7.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20230525234030-28d5490b6b19 // indirect
