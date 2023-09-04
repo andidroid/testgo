@@ -21,7 +21,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Set up Go
         uses: actions/setup-go@v4
@@ -54,7 +54,7 @@ jobs:
 
     steps:
       - name: Git Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
@@ -79,7 +79,7 @@ jobs:
       GO111MODULE: on
     steps:
       - name: Checkout Source
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Run Gosec Security Scanner
         uses: securego/gosec@master
         with:
@@ -109,7 +109,7 @@ jobs:
     needs: build
     steps:
       - name: Git Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           persist-credentials: false # otherwise, the token used is the GITHUB_TOKEN, instead of your personal access token.
           fetch-depth: 0 # otherwise, there would be errors pushing refs to the destination repository.
@@ -193,7 +193,7 @@ jobs:
           semver --version
 
       - name: Checkout private tools
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: andidroid/gorouting-gitops
           token: ${{ secrets.ANDIDROID_PACKAGES }} # `GH_PAT` is a secret that contains your PAT
@@ -231,7 +231,7 @@ jobs:
 
     steps:
       - name: Git Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Super-Linter
         uses: github/super-linter@v5.0.0
         env:
