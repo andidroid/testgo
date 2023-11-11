@@ -294,8 +294,8 @@ go.mongodb.org/mongo-driver v1.13.0 h1:67DgFFjYOCMWdtTEmKFpV3ffWlFnh+CYZ8ZS/tXWU
 go.mongodb.org/mongo-driver v1.13.0/go.mod h1:/rGBTebI3XYboVmgz+Wv3Bcbl3aD0QF9zl6kDDw18rQ=
 go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin v0.46.0 h1:HmYb/o3WaykpA6E5s/iQX1qQCM7gvdUwqhDls+rOONQ=
 go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin v0.46.0/go.mod h1:DwcLBZlbUzNs5CSBob2XoF3BqN9JYK0AJkP0MShs3mE=
-go.opentelemetry.io/contrib/instrumentation/go.mongodb.org/mongo-driver/mongo/otelmongo v0.45.0 h1:bldpPC7XAv7f7LKTwNfRkNdzRhjtXaWybZFFa16dAb8=
-go.opentelemetry.io/contrib/instrumentation/go.mongodb.org/mongo-driver/mongo/otelmongo v0.45.0/go.mod h1:xhkNpJG3D+kmuaciNTco7cdK27Fb77J9Iqcq5CMe4Y8=
+go.opentelemetry.io/contrib/instrumentation/go.mongodb.org/mongo-driver/mongo/otelmongo v0.46.0 h1:1b/GR0eOpqQJ0kjJeuzDwqUzcQD3cnZgsAPlG8032BQ=
+go.opentelemetry.io/contrib/instrumentation/go.mongodb.org/mongo-driver/mongo/otelmongo v0.46.0/go.mod h1:2nM/khnHtYdbPG/3dWxS8RN+t8/OChavUx5JZHdgAEM=
 go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.45.0 h1:x8Z78aZx8cOF0+Kkazoc7lwUNMGy0LrzEMxTm4BbTxg=
 go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.45.0/go.mod h1:62CPTSry9QZtOaSsE3tOzhx6LzDhHnXJ6xHeMNNiM6Q=
 go.opentelemetry.io/contrib/propagators/b3 v1.21.0 h1:uGdgDPNzwQWRwCXJgw/7h29JaRqcq9B87Iv4hJDKAZw=
