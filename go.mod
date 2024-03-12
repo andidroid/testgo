@@ -6,7 +6,7 @@ require (
 	github.com/RediSearch/redisearch-go v1.1.1
 	github.com/blockloop/scan v1.3.0
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
-	github.com/gin-contrib/cors v1.6.0
+	github.com/gin-contrib/cors v1.7.0
 	github.com/gin-gonic/gin v1.9.1
 	github.com/go-playground/validator v9.31.0+incompatible
 	github.com/go-redis/redis/extra/redisotel/v8 v8.11.5
