@@ -237,7 +237,7 @@ jobs:
       - name: Git Checkout
         uses: actions/checkout@v4
       - name: Super-Linter
-        uses: github/super-linter@v5.0.0
+        uses: github/super-linter@v6
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VALIDATE_ALL_CODEBASE: false
