@@ -12,7 +12,7 @@ require (
 	github.com/go-redis/redis/extra/redisotel/v8 v8.11.5
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/lib/pq v1.10.9
-	github.com/prometheus/client_golang v1.23.0
+	github.com/prometheus/client_golang v1.23.1
 	github.com/stretchr/testify v1.11.1
 	github.com/testcontainers/testcontainers-go v0.38.0
 	go.mongodb.org/mongo-driver v1.17.4
@@ -62,6 +62,7 @@ require (
 	github.com/golang/snappy v1.0.0 // indirect
 	github.com/gomodule/redigo v1.8.3 // indirect
 	github.com/google/uuid v1.6.0 // indirect
+	github.com/grafana/regexp v0.0.0-20240518133315-a468a5bfb3bc // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/klauspost/compress v1.18.0 // indirect
 	github.com/klauspost/cpuid/v2 v2.3.0 // indirect
@@ -88,7 +89,7 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/power-devops/perfstat v0.0.0-20210106213030-5aafc221ea8c // indirect
 	github.com/prometheus/client_model v0.6.2 // indirect
-	github.com/prometheus/common v0.65.0 // indirect
+	github.com/prometheus/common v0.66.0 // indirect
 	github.com/prometheus/procfs v0.16.1 // indirect
 	github.com/shirou/gopsutil/v4 v4.25.5 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
@@ -114,5 +115,6 @@ require (
 	golang.org/x/text v0.28.0 // indirect
 	google.golang.org/protobuf v1.36.8 // indirect
 	gopkg.in/go-playground/assert.v1 v1.2.1 // indirect
+	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
