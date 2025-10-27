@@ -47,7 +47,7 @@ jobs:
       # - name: Test
       #   run: go test -short -v ./...
       - name: upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: testgo-artifact
           path: testgo
