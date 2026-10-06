@@ -1,12 +1,12 @@
 module github.com/andidroid/testgo
 
-go 1.25.0
+go 1.26.0
 
 require (
 	github.com/RediSearch/redisearch-go v1.1.1
 	github.com/blockloop/scan v1.3.0
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
-	github.com/gin-contrib/cors v1.7.8
+	github.com/gin-contrib/cors v1.7.9
 	github.com/gin-gonic/gin v1.12.0
 	github.com/go-playground/validator v9.31.0+incompatible
 	github.com/go-redis/redis/extra/redisotel/v8 v8.11.5
@@ -107,7 +107,7 @@ require (
 	go.opentelemetry.io/otel/trace v1.46.0 // indirect
 	go.yaml.in/yaml/v3 v3.0.5 // indirect
 	golang.org/x/arch v0.30.0 // indirect
-	golang.org/x/crypto v0.55.0 // indirect
+	golang.org/x/crypto v0.56.0 // indirect
 	golang.org/x/net v0.58.0 // indirect
 	golang.org/x/sync v0.22.0 // indirect
 	golang.org/x/sys v0.47.0 // indirect
